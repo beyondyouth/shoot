@@ -17,10 +17,11 @@ void SendThread::run()
 			_Sock->writeData(_sendbuf, _buflen);
 			bzero(_sendbuf, MAXDATASIZE);
 		}
+		msleep(50);
 	}
 }
 
-void writebuf(u8* buf, u32 len)
+void writeData(u8* buf, u32 len)
 {
 	_sendbuf = buf;
 	_buflen = len;

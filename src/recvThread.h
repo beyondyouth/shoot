@@ -16,7 +16,7 @@ private:
 	Socket* _Sock;
 };
 
-void readbuf(u8* buf, u32 len);
+void readData(u8* buf, u32 len);
 
 #endif/*RECV_THREAD_H__*/
 

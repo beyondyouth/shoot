@@ -78,8 +78,8 @@ bool TcpClient::conn(const char* servIp, u16 servPort)
 
 	if(-1 == connect(_sockfd, (struct sockaddr*)&_serverAddr, sizeof(struct sockaddr)))
 	{
-		printf("Connect: %s failed!",inet_ntoa(_serverAddr.sin_addr));
-		disConn();
+		printf("Connect: %s failed!\n",inet_ntoa(_serverAddr.sin_addr));
+		//disConn();
 		return false;
 	}
 

@@ -18,7 +18,7 @@ void Shoot::run()
 	if(SERVER == _type)
 	{
 		TcpServer InsServer;
-		InsServer.init("192.168.99.129", 8817);
+		InsServer.init("10.0.2.15", 8817);
 		InsServer.setSocketBlock();
 		printf("accepting------------\n");
 		InsServer.acceptConn();
@@ -27,24 +27,24 @@ void Shoot::run()
 		
 		RecvThread InsRecv((Socket*)&InsServer);
 		InsRecv.start();
-//		SendThread InsSend((Socket*)&InsServer);
-//		InsSend.start();
+		SendThread InsSend((Socket*)&InsServer);
+		InsSend.start();
 		
-//		u8 i = 0;
+		u8 i = 0;
 		while(1)
 		{
-//			sprintf(sendbuf, "hello ,I'm tcp server %d", i);
-//			i++;
-//			writebuf((u8*)sendbuf, 20);
-//			printf("send data:%s\n", sendbuf);
-			readbuf((u8*)recvbuf, 20);
+			sprintf(sendbuf, "hello ,I'm tcp server %d", i);
+			i++;
+			writeData((u8*)sendbuf, 30);
+			printf("send data:%s\n", sendbuf);
+			readData((u8*)recvbuf, 30);
 			if(0 != recvbuf[0])
 				printf("recv data:%s\n", recvbuf);
-			sleep(5);
+			sleep(2);
 		}
 		
 		InsRecv.wait();
-//		InsSend.wait();
+		InsSend.wait();
 	}
 	else if(CLIENT == _type)
 	{
@@ -52,12 +52,15 @@ void Shoot::run()
 		InsClient.init();
 		InsClient.setSocketBlock();
 		printf("connecting-----------\n");
-		InsClient.conn("192.168.99.129", 8817);
+		while(false == InsClient.conn("10.0.2.15", 8817))
+		{
+			sleep(3);
+		}
 		
 		printf("connect success\n");
 		
-//		RecvThread InsRecv((Socket*)&InsClient);
-//		InsRecv.start();
+		RecvThread InsRecv((Socket*)&InsClient);
+		InsRecv.start();
 		SendThread InsSend((Socket*)&InsClient);
 		InsSend.start();
 		
@@ -66,15 +69,15 @@ void Shoot::run()
 		{
 			sprintf(sendbuf, "hello ,I'm tcp client %d", i);
 			i++;
-			writebuf((u8*)sendbuf, 20);
+			writeData((u8*)sendbuf, 30);
 			printf("send data:%s\n", sendbuf);
-//			readbuf((u8*)recvbuf, 20);
-//			if(0 != recvbuf[0])
-//				printf("recv data:%s\n", recvbuf);
-			sleep(5);
+			readData((u8*)recvbuf, 30);
+			if(0 != recvbuf[0])
+				printf("recv data:%s\n", recvbuf);
+			sleep(2);
 		}
 		
-//		InsRecv.wait();
+		InsRecv.wait();
 		InsSend.wait();
 	}
 }

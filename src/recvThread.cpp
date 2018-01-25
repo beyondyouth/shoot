@@ -21,13 +21,16 @@ void RecvThread::run()
 			memcpy(_recvbuf, tempbuf, MAXDATASIZE);
 			bzero(tempbuf, MAXDATASIZE);
 		}
-		
+		msleep(50);
 	}
 }
 
-void readbuf(u8* buf, u32 len)
+void readData(u8* buf, u32 len)
 {
 	if(NULL != _recvbuf)
+	{
 		memcpy(buf, _recvbuf, len);
+		bzero(_recvbuf, MAXDATASIZE);
+	}
 }
 

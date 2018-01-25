@@ -16,6 +16,6 @@ private:
 	Socket* _Sock;
 };
 
-void writebuf(u8* buf, u32 len);
+void writeData(u8* buf, u32 len);
 
 #endif/*SEND_THREAD_H__*/

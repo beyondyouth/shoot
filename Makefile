@@ -11,7 +11,7 @@ BIN_TARGET = ${DIR_OBJ}/${TARGET}
 CFLAGS = -g -Wall -I${DIR_SRC} 
 
 ${BIN_TARGET}:${OBJECT}  
-	g++ -o $@ ${OBJECT} -lpthread
+	g++ -o $@ ${OBJECT} -lpthread -lncurses
    
 #生成各个中间文件  
 ${DIR_OBJ}/%.o:${DIR_SRC}/%.cpp
