@@ -20,12 +20,12 @@ bool TcpServer::init(const char* localIp, u16 localPort)
 		return -1;
 	}
 
-	_localAddr.sin_family = AF_INET;
-	_localAddr.sin_port = htons(localPort);
-	_localAddr.sin_addr.s_addr = INADDR_ANY;
+	_serverAddr.sin_family = AF_INET;
+	_serverAddr.sin_port = htons(localPort);
+	_serverAddr.sin_addr.s_addr = INADDR_ANY;
 	bzero(&(_serverAddr.sin_zero), 8);
 	
-	if(-1 == bind(_sockfd,(struct sockaddr *)&_localAddr,sizeof(_localAddr)))
+	if(-1 == bind(_sockfd,(struct sockaddr *)&_serverAddr,sizeof(_serverAddr)))
 	{
 		close(_sockfd);
 		printf("error:%s %d",__FILE__, __LINE__);
@@ -40,16 +40,27 @@ bool TcpServer::init(const char* localIp, u16 localPort)
 		return false;
 	}
 
-	acceptConn();
+	return true;
+}
+
+bool TcpServer::setSocketBlock()
+{
+	fcntl(_sockfd, F_SETFL, fcntl(_sockfd, F_GETFL) & ~O_NONBLOCK);
+	fcntl(_sockfd, F_SETFD, FD_CLOEXEC);
+	return true;
+}
+
+bool TcpServer::setSocketNonblock()
+{
+	fcntl(_sockfd, F_SETFL, fcntl(_sockfd, F_GETFL) | O_NONBLOCK);
 	return true;
 }
 
 bool TcpServer::acceptConn()
 {
-	struct sockaddr_in clientSockAddr;
-	u32 addrLen = sizeof(clientSockAddr);
-	bzero(&clientSockAddr,addrLen);
-	accept(_sockfd,(struct sockaddr *)&clientSockAddr,(socklen_t*)&addrLen);
+	u32 addrLen = sizeof(_clientAddr);
+	bzero(&_clientAddr,addrLen);
+	_client_sockfd = accept(_sockfd,(struct sockaddr *)&_clientAddr,(socklen_t*)&addrLen);
 	return true;
 }
 
@@ -57,7 +68,8 @@ bool TcpServer::readData(u8 *buf,u32 len)
 {
 	if(len > MAXDATASIZE)
 		len = MAXDATASIZE;
-	recv(_sockfd, buf, len, 0);
+	if(-1 == recv(_client_sockfd, buf, len, 0))
+		return false;
 	return true;
 }
 
@@ -65,7 +77,8 @@ bool TcpServer::writeData(const u8 *buf,u32 len)
 {
 	if(len > MAXDATASIZE)
 		len = MAXDATASIZE;
-	send(_sockfd, buf, len, 0);
+	if(-1 == send(_client_sockfd, buf, len, 0))
+		return false;
 	return true;
 }
 

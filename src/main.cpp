@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "shoot.h"
+#include "shootThread.h"
 
 #if 1
 #define GAME_READY 1

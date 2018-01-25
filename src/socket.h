@@ -5,6 +5,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdio.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
 #include "basetype.h"
@@ -21,7 +22,8 @@ public:
 
 	virtual bool readData(u8 *buf, u32 bufLen) = 0;
 	virtual bool writeData(const u8 *buf, u32 dataLen) = 0;
-
+	virtual bool setSocketBlock() = 0;
+	virtual bool setSocketNonblock() = 0;
 //	virtual void closes();
 protected:			
 	int _sockfd;
@@ -29,7 +31,7 @@ protected:
 	char _localIp[32];
 	u16 _localPort;
 	
-	struct sockaddr_in _localAddr;
+	struct sockaddr_in _clientAddr;
 	struct sockaddr_in _serverAddr;
 };
 

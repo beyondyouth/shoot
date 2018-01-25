@@ -8,6 +8,21 @@ TcpClient::~TcpClient()
 {
 }
 
+bool TcpClient::init()
+{
+	strcpy(_localIp,"");
+	_localPort = 0;
+	
+	_sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (-1 == _sockfd)
+	{
+		printf("error:%s %d",__FILE__, __LINE__);
+		return false;
+	}
+
+	return true;
+}
+
 bool TcpClient::init(const char* localIp, u16 localPort)
 {
 
@@ -26,11 +41,24 @@ bool TcpClient::init(const char* localIp, u16 localPort)
 		return false;
 	}	
 
-	bzero(&_localAddr,sizeof(_localAddr));
-	_localAddr.sin_family = AF_INET;
-	_localAddr.sin_port = htons(localPort);
-	_localAddr.sin_addr.s_addr = inet_addr(localIp);
+	bzero(&_clientAddr,sizeof(_clientAddr));
+	_clientAddr.sin_family = AF_INET;
+	_clientAddr.sin_port = htons(localPort);
+	_clientAddr.sin_addr.s_addr = inet_addr(localIp);
 
+	return true;
+}
+
+bool TcpClient::setSocketBlock()
+{
+	fcntl(_sockfd, F_SETFL, fcntl(_sockfd, F_GETFL) & ~O_NONBLOCK);
+	fcntl(_sockfd, F_SETFD, FD_CLOEXEC);
+	return true;
+}
+
+bool TcpClient::setSocketNonblock()
+{
+	fcntl(_sockfd, F_SETFL, fcntl(_sockfd, F_GETFL) | O_NONBLOCK);
 	return true;
 }
 
@@ -73,7 +101,8 @@ bool TcpClient::readData(u8 *buf,u32 len)
 {
 	if(len > MAXDATASIZE)
 		len = MAXDATASIZE;
-	recv(_sockfd, buf, len, 0);
+	if(-1 == recv(_sockfd, buf, len, 0))
+		return false;
 	return true;
 }
 
@@ -81,6 +110,7 @@ bool TcpClient::writeData(const u8 *buf,u32 len)
 {
 	if(len > MAXDATASIZE)
 		len = MAXDATASIZE;
-	send(_sockfd, buf, len, 0);
+	if(-1 == send(_sockfd, buf, len, 0))
+		return false;
 	return true;
 }

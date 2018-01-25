@@ -1,5 +1,5 @@
-#ifndef SHOOT_H__
-#define SHOOT_H__
+#ifndef SHOOT_THREAD_H__
+#define SHOOT_THREAD_H__
 
 #include "thread.h"
 #include "tcp_server.h"

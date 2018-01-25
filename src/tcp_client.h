@@ -12,8 +12,11 @@ public:
 	virtual bool init(const char* localIp,u16 localPort);
 	virtual bool readData(u8 *buf,u32 len);
 	virtual bool writeData(const u8 *buf,u32 len);
+	virtual bool setSocketBlock(void);
+	virtual bool setSocketNonblock(void);
+	bool init(void);
 	bool conn(const char* servIp, u16 servPort);
-	bool disConn();
+	bool disConn(void);
 private:
 	bool _bConnected;
 };
