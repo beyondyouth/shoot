@@ -13,6 +13,8 @@ class Shoot : public Thread
 public:
 	Shoot(u8 type);
 	~Shoot();
+	int create_room(void);
+	int join_room(void);
 	
 protected:
 	virtual void run();

@@ -81,3 +81,19 @@ void Shoot::run()
 		InsSend.wait();
 	}
 }
+
+int Shoot::create_room()
+{
+	Shoot InsShoot(SERVER);
+	InsShoot.start();
+	InsShoot.wait();
+	return 0;
+}
+
+int Shoot::join_room()
+{
+	Shoot InsShoot(CLIENT);
+	InsShoot.start();
+	InsShoot.wait();
+	return 0;
+}
