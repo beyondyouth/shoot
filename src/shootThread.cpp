@@ -2,34 +2,58 @@
 #include "sendThread.h"
 #include "recvThread.h"
 #include <string.h>
-Shoot::Shoot(u8 type)
+
+u8 link_state = LINK_FAILED;
+
+u8 getLink_state()
+{
+	return link_state;
+}
+
+ShootThead* ShootThead::p = new ShootThead;
+
+ShootThead* ShootThead::getInstance()
+{
+    return p;
+}
+
+ShootThead::ShootThead()
+{
+}
+
+ShootThead::~ShootThead()
+{
+	delete p;
+}
+
+int ShootThead::init(u8 type)
 {
 	_type = type;
+	return 0;
 }
 
-Shoot::~Shoot()
+void ShootThead::run()
 {
-}
-
-void Shoot::run()
-{
-	char sendbuf[MAXDATASIZE]={0};
-	char recvbuf[MAXDATASIZE]={0};
+//	char sendbuf[MAXDATASIZE]={0};
+//	char recvbuf[MAXDATASIZE]={0};
 	if(SERVER == _type)
 	{
 		TcpServer InsServer;
-		InsServer.init("10.0.2.15", 8817);
-		InsServer.setSocketBlock();
-		printf("accepting------------\n");
+		if(false == InsServer.init("10.0.2.15", 8817))
+			return;
+		if(false == InsServer.setSocketBlock())
+			return;
+//		printf("accepting------------\n");
+		link_state = LINK_ACCEPT;
 		InsServer.acceptConn();
-		
-		printf("connect success\n");
+		link_state = LINK_SUCCESS;
+//		printf("connect success\n");
 		
 		RecvThread InsRecv((Socket*)&InsServer);
 		InsRecv.start();
 		SendThread InsSend((Socket*)&InsServer);
 		InsSend.start();
-		
+/*		
 		u8 i = 0;
 		while(1)
 		{
@@ -40,30 +64,32 @@ void Shoot::run()
 			readData((u8*)recvbuf, 30);
 			if(0 != recvbuf[0])
 				printf("recv data:%s\n", recvbuf);
-			sleep(2);
+			sleep(5);
 		}
-		
+*/		
 		InsRecv.wait();
 		InsSend.wait();
 	}
 	else if(CLIENT == _type)
 	{
 		TcpClient InsClient;
-		InsClient.init();
-		InsClient.setSocketBlock();
-		printf("connecting-----------\n");
+		if(false == InsClient.init())
+			return;
+		if(false == InsClient.setSocketBlock())
+//		printf("connecting-----------\n");
+		link_state = LINK_CONNECT;
 		while(false == InsClient.conn("10.0.2.15", 8817))
 		{
 			sleep(3);
 		}
 		
-		printf("connect success\n");
-		
+//		printf("connect success\n");
+		link_state = LINK_SUCCESS;
 		RecvThread InsRecv((Socket*)&InsClient);
 		InsRecv.start();
 		SendThread InsSend((Socket*)&InsClient);
 		InsSend.start();
-		
+/*		
 		u8 i = 0;
 		while(1)
 		{
@@ -74,26 +100,30 @@ void Shoot::run()
 			readData((u8*)recvbuf, 30);
 			if(0 != recvbuf[0])
 				printf("recv data:%s\n", recvbuf);
-			sleep(2);
+			sleep(5);
 		}
-		
+*/		
 		InsRecv.wait();
 		InsSend.wait();
 	}
 }
 
-int Shoot::create_room()
+int ShootThead::create_room()
 {
-	Shoot InsShoot(SERVER);
-	InsShoot.start();
-	InsShoot.wait();
+	ShootThead* pInsShoot;
+	pInsShoot = ShootThead::getInstance();
+	pInsShoot->init(SERVER);
+	pInsShoot->start();
+	//pInsShoot->wait();
 	return 0;
 }
 
-int Shoot::join_room()
+int ShootThead::join_room()
 {
-	Shoot InsShoot(CLIENT);
-	InsShoot.start();
-	InsShoot.wait();
+	ShootThead* pInsShoot;
+	pInsShoot = ShootThead::getInstance();
+	pInsShoot->init(CLIENT);
+	pInsShoot->start();
+	//pInsShoot->wait();
 	return 0;
 }

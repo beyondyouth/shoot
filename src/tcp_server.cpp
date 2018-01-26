@@ -10,6 +10,7 @@ TcpServer::~TcpServer()
 
 bool TcpServer::init(const char* localIp, u16 localPort)
 {
+	_client_sockfd = 0;
 	_localPort = localPort;
 	strcpy(_localIp,localIp);
 	
@@ -61,6 +62,11 @@ bool TcpServer::acceptConn()
 	u32 addrLen = sizeof(_clientAddr);
 	bzero(&_clientAddr,addrLen);
 	_client_sockfd = accept(_sockfd,(struct sockaddr *)&_clientAddr,(socklen_t*)&addrLen);
+	if(0 == _client_sockfd)
+	{
+		printf("error:%s %d",__FILE__, __LINE__);
+		return false;
+	}
 	return true;
 }
 
@@ -69,7 +75,10 @@ bool TcpServer::readData(u8 *buf,u32 len)
 	if(len > MAXDATASIZE)
 		len = MAXDATASIZE;
 	if(-1 == recv(_client_sockfd, buf, len, 0))
+	{
+		printf("error:%s %d",__FILE__, __LINE__);
 		return false;
+	}
 	return true;
 }
 
@@ -78,7 +87,10 @@ bool TcpServer::writeData(const u8 *buf,u32 len)
 	if(len > MAXDATASIZE)
 		len = MAXDATASIZE;
 	if(-1 == send(_client_sockfd, buf, len, 0))
+	{
+		printf("error:%s %d",__FILE__, __LINE__);
 		return false;
+	}
 	return true;
 }
 

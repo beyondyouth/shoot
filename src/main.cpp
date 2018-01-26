@@ -9,7 +9,12 @@ int main(int argc, char* argv[])
 {
 	MapThread InsMap;
 	InsMap.init();
+	InsMap.start();
 	InsMap.main_menu();
+	
+	
+	while(GAME_LINK == getGame_state());
+	InsMap.game_panel();
 	InsMap.respond();
 	return 0;
 }

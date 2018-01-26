@@ -102,7 +102,10 @@ bool TcpClient::readData(u8 *buf,u32 len)
 	if(len > MAXDATASIZE)
 		len = MAXDATASIZE;
 	if(-1 == recv(_sockfd, buf, len, 0))
+	{
+		printf("error:%s %d",__FILE__, __LINE__);
 		return false;
+	}
 	return true;
 }
 
@@ -111,6 +114,9 @@ bool TcpClient::writeData(const u8 *buf,u32 len)
 	if(len > MAXDATASIZE)
 		len = MAXDATASIZE;
 	if(-1 == send(_sockfd, buf, len, 0))
+	{
+		printf("error:%s %d",__FILE__, __LINE__);
 		return false;
+	}
 	return true;
 }

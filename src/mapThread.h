@@ -6,8 +6,10 @@
 #include <ctype.h>
 #include "thread.h"
 
+
 #define GAME_READY 1
-#define GAME_START 2
+#define GAME_LINK 2
+#define GAME_START 3
 #define GAME_OVER 0
 
 class MapThread : public Thread
@@ -22,7 +24,12 @@ public:
 	bool respond();
 protected:
 	virtual void run();
+private:
+	u8 localData[6];
+	u8 remoteData[6];
 	
 };
+
+u8 getGame_state(void);
 
 #endif/*MAP_THREAD_H__*/

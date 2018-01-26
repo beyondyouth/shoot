@@ -57,7 +57,7 @@ int Thread::wait()
 		return STATUS_OK;
 	}
 	_isJoining = true;
-	printf("pthread_join...%s\n", _threadName.c_str());
+//	printf("pthread_join...%s\n", _threadName.c_str());
 	if (THREAD_SUCCES ==  pthread_join(_threadId, NULL))
 	{
 		_isJoining = false;

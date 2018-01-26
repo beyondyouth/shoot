@@ -8,19 +8,30 @@
 #define SERVER 1
 #define CLIENT 2
 
-class Shoot : public Thread
+#define LINK_ACCEPT 1
+#define LINK_CONNECT 2
+#define LINK_SUCCESS 3
+#define LINK_FAILED 0
+
+class ShootThead : public Thread
 {
 public:
-	Shoot(u8 type);
-	~Shoot();
-	int create_room(void);
-	int join_room(void);
+	~ShootThead();
+	int init(u8 type);
+	static int create_room(void);
+	static int join_room(void);
+
+	static ShootThead* getInstance(void);
 	
 protected:
 	virtual void run();
 	
 private:
 	u8 _type;
+	static ShootThead* p;
+	ShootThead();
 };
 
-#endif/*SHOOT_H__*/
+u8 getLink_state();
+
+#endif/*SHOOT_THREAD_H__*/
