@@ -15,6 +15,7 @@ public:
 	void home();
 	void lobby();
 	void fight();
+	void exit();
 	
 protected:
 	virtual void run();

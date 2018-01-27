@@ -8,7 +8,8 @@ enum L_state
 	LINK_FAILED,
 	LINK_ACCEPT,
 	LINK_CONNECT,
-	LINK_SUCCESS
+	LINK_SUCCESS,
+	LINK_ABORT
 };
 
 enum G_state
@@ -16,6 +17,7 @@ enum G_state
 	GAME_OVER,
 	GAME_MENU,
 	GAME_WAIT,
+	GAME_READY,
 	GAME_FIGHT
 };
 

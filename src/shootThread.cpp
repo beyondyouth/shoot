@@ -9,9 +9,9 @@ L_state getLinkState()
 	return link_state;
 }
 
-u8 getLink_state()
+void setLinkState(L_state s)
 {
-	return link_state;
+	link_state = s;
 }
 
 ShootThread* ShootThread::p = NULL;

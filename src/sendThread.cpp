@@ -3,6 +3,8 @@
 static u8* _sendbuf = NULL;
 static u32 _buflen = MAXDATASIZE;
 
+extern void setLinkState(L_state s);
+
 SendThread::SendThread(Socket* pSock)
 {
 	_Sock = pSock;
@@ -14,7 +16,11 @@ void SendThread::run()
 	{
 		if(0 != _sendbuf[0])
 		{
-			_Sock->writeData(_sendbuf, _buflen);
+			if(false == _Sock->writeData(_sendbuf, _buflen))
+			{
+				printf("error:%s %d",__FILE__, __LINE__);
+				setLinkState(LINK_ABORT);
+			}
 			bzero(_sendbuf, MAXDATASIZE);
 		}
 		msleep(50);

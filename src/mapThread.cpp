@@ -21,6 +21,7 @@ static char* item[] =
 {
 	(char*)"create room",
 	(char*)"join room",
+	(char*)"exit"
 };
 
 static int sum_item = sizeof(item)/sizeof(item[0]);
@@ -68,7 +69,9 @@ void MapThread::home()
 	{
 		ch = getch();
 		if(KEY_F(1) == ch)
-			break;
+		{
+			game_state = GAME_OVER;
+		}
 		switch (ch)
 		{
 			case KEY_DOWN:
@@ -108,6 +111,10 @@ void MapThread::home()
 					game_mode = MODE_CLIENT;
 					game_state = GAME_WAIT;
 				}
+				else if(!strcmp("exit", item[i]))
+				{
+					game_state = GAME_OVER;
+				}
 				break;
 			default:
 				break;
@@ -118,12 +125,6 @@ void MapThread::home()
 		ShootThread* pInsShoot;
 		pInsShoot = ShootThread::getInstance();
 		pInsShoot->start();
-	}
-	if(KEY_F(1) == ch)
-	{
-		game_state = GAME_OVER;
-		refresh();
-		endwin();
 		return;
 	}
 }
@@ -133,19 +134,18 @@ void MapThread::lobby()
 	int ch = 0;
 	char str[] = "waiting...";
 	mvprintw(LINES - 1, (COLS-strlen(str))/2, "%s", str);
+	if(GAME_WAIT != game_state)
+		return;
 	while(GAME_WAIT == game_state)
 	{
 		ch = getch();
 		if(KEY_F(1) == ch)
-			break;
+		{
+			game_state = GAME_OVER;
+		}
 	}
-	if(KEY_F(1) == ch)
-	{
-		game_state = GAME_OVER;
-		refresh();
-		endwin();
-		return;
-	}
+	if(GAME_READY == game_state)
+		game_state = GAME_FIGHT;
 }
 
 void MapThread::fight()
@@ -156,13 +156,19 @@ void MapThread::fight()
 	int startx, starty, width, height;
 	height = LINES - 2;
 	width = COLS;
-	starty = (LINES-height)/2;/*计算窗口中心位置的行数*/
+	starty = (LINES-height)/2 + 1;/*计算窗口中心位置的行数*/
 	startx = (COLS-width)/2;/*计算窗口中心位置的列数*/
 //	printw("Press F1 to exit");
 	refresh();
 	game_win = create_newwin(height,width,starty,startx);
 	
 	respond(game_win);
+}
+
+void MapThread::exit()
+{
+	refresh();
+	endwin();
 }
 
 WINDOW* my_win = NULL;
@@ -176,10 +182,10 @@ bool MapThread::respond(WINDOW* local_win)
 	if(GAME_FIGHT != game_state)
 		return false;
 	my_win = local_win;
-	while(1)
+	while(GAME_FIGHT == game_state)
 	{
 		sprintf((char*)localData, "%03d%03d", c, l);
-		mvprintw(0, 10, "localData:%s", localData);
+//		mvprintw(0, 10, "localData:%s", localData);
 		memcpy(sX_local, localData, 3);
 		memcpy(sY_local, localData + 3, 3);
 			
@@ -198,7 +204,10 @@ bool MapThread::respond(WINDOW* local_win)
 		//mvprintw(0, 30, " %03d,%03d ", x, y);
 		ch = getch();
 		if(KEY_F(1) == ch)
+		{
+			game_state = GAME_OVER;
 			break;
+		}
 		switch (ch)
 		{
 			case KEY_DOWN:
@@ -218,32 +227,44 @@ bool MapThread::respond(WINDOW* local_win)
 		}
 //		mvprintw(0, 50, "%d", ch);
 	}
-	if(KEY_F(1) == ch)
-	{
-		game_state = GAME_OVER;
-		refresh();
-		endwin();
-		return true;
-	}
+	return true;
 }
 
 void MapThread::run()
 {
 	int iX_remote = COLS/2, iY_remote = LINES/2;
 	static int iX_remote_org = COLS/2, iY_remote_org = LINES/2;
+	static int count = 0;
 	char sX_remote[3] = {0}, sY_remote[3] = {0};
+	char str[20] = "null";
 	while(GAME_OVER != game_state)
 	{
-		if(LINK_SUCCESS == getLinkState())
-			game_state = GAME_FIGHT;
-		/*Map update*/
-//		memcpy((char*)localData, "hello ", 6);
-		writeData((u8*)localData, 6);
-
-		readData((u8*)remoteData, 6);
-		mvprintw(0, 80, "remoteData:%s", remoteData);
+		if(LINK_SUCCESS == getLinkState() && GAME_WAIT == getGameState())
+		{
+			game_state = GAME_READY;
+		}
+	
+		if(LINK_ABORT == getLinkState())
+		{
+			game_state = GAME_OVER;
+		}
 		
-		mvprintw(0, 40, "lin_state:%d", getLinkState());
+		if(GAME_READY == getGameState())
+		{
+			count++;
+			if(count > 40)
+				count = 0;
+			if(count < 20)
+				mvprintw(LINES - 1, (COLS-strlen("please press any key"))/2, "%s", "please press any key");
+			else
+				mvprintw(LINES - 1, (COLS-strlen("                    "))/2, "%s", "                    ");	
+		}
+		/*Map update*/
+		writeData((u8*)localData, 6);
+		readData((u8*)remoteData, 6);
+		
+		sprintf(str, "link_state:%d", getLinkState());
+		mvprintw(0, (COLS - strlen(str))/2, "%s", str);
 		
 		if(NULL != my_win && 0 != remoteData[0])
 		{

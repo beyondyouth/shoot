@@ -13,6 +13,7 @@ int main(int argc, char* argv[])
 	InsMap.home();//主界面
 	InsMap.lobby();//大厅
 	InsMap.fight();//游戏界面
+	InsMap.exit();//退出游戏
 	return 0;
 }
 

@@ -3,6 +3,8 @@
 static u8 _recvbuf[MAXDATASIZE];
 static u32 _buflen = MAXDATASIZE;
 
+extern void setLinkState(L_state s);
+
 RecvThread::RecvThread(Socket* pSock)
 {
 	_Sock = pSock;
@@ -15,7 +17,11 @@ void RecvThread::run()
 	while(LINK_SUCCESS == getLinkState() && GAME_OVER != getGameState())
 	{
 		
-		_Sock->readData(tempbuf, _buflen);
+		if(false == _Sock->readData(tempbuf, _buflen))
+		{
+			printf("error:%s %d",__FILE__, __LINE__);
+			setLinkState(LINK_ABORT);
+		}
 		if(0 != tempbuf[0])
 		{
 			memcpy(_recvbuf, tempbuf, MAXDATASIZE);
