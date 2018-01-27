@@ -10,7 +10,7 @@ SendThread::SendThread(Socket* pSock)
 
 void SendThread::run()
 {
-	while(1)
+	while(LINK_SUCCESS == getLinkState() && GAME_OVER != getGameState())
 	{
 		if(0 != _sendbuf[0])
 		{

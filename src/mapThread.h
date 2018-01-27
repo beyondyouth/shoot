@@ -7,23 +7,21 @@
 #include "thread.h"
 
 
-#define GAME_READY 1
-#define GAME_LINK 2
-#define GAME_START 3
-#define GAME_OVER 0
-
 class MapThread : public Thread
 {
 
 public:
 	bool init();
-	WINDOW* create_newwin(int height,int width,int starty,int startx);
-	void destroy_win(WINDOW* local_win);
-	void main_menu();
-	void game_panel();
-	bool respond();
+	void home();
+	void lobby();
+	void fight();
+	
 protected:
 	virtual void run();
+	WINDOW* create_newwin(int height,int width,int starty,int startx);
+	void destroy_win(WINDOW* local_win);
+	bool respond(WINDOW* local_win);
+
 private:
 	u8 localData[6];
 	u8 remoteData[6];

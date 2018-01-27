@@ -12,7 +12,7 @@ void RecvThread::run()
 {
 	u8 tempbuf[MAXDATASIZE];
 	bzero(tempbuf, MAXDATASIZE);
-	while(1)
+	while(LINK_SUCCESS == getLinkState() && GAME_OVER != getGameState())
 	{
 		
 		_Sock->readData(tempbuf, _buflen);
