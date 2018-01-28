@@ -1,19 +1,21 @@
 #if 1
 
 #include <stdio.h>
-
-#include "shootThread.h"
-#include "mapThread.h"
+#include "monitorThread.h"
 
 int main(int argc, char* argv[])
 {
-	MapThread InsMap;
+/*	MapThread InsMap;
 	InsMap.init();//curses初始化，进入curses界面
 	InsMap.start();//开始界面刷新线程，可用于调式
 	InsMap.home();//主界面
 	InsMap.lobby();//大厅
 	InsMap.fight();//游戏界面
 	InsMap.exit();//退出游戏
+*/
+	monitorThread InsMonitor;
+	InsMonitor.start();
+	InsMonitor.wait();
 	return 0;
 }
 

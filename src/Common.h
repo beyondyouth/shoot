@@ -1,7 +1,10 @@
 #ifndef COMMON_H__
 #define COMMON_H__
 
-#include "basetype.h"
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned int u32;
+typedef unsigned long long u64;
 
 enum L_state
 {
@@ -14,18 +17,21 @@ enum L_state
 
 enum G_state
 {
-	GAME_OVER,
-	GAME_MENU,
-	GAME_WAIT,
+	GAME_START,
+	GAME_MAINMENU,
+	GAME_SCANING,
+	GAME_LINKING,
 	GAME_READY,
-	GAME_FIGHT
+	GAME_FIGHT,
+	GAME_OVER,
+	GAME_EXIT
 };
 
 enum Mode
 {
 	MODE_UNKNOW,
-	MODE_SERVER,
-	MODE_CLIENT
+	MODE_CREATE,
+	MODE_JOIN
 };
 
 L_state getLinkState();

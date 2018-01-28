@@ -1,14 +1,14 @@
-#include "tcp_client.h"
+#include "Udp_Client.h"
 
-TcpClient::TcpClient()
+UdpClient::UdpClient()
 {
 }
 
-TcpClient::~TcpClient()
+UdpClient::~UdpClient()
 {
 }
 
-bool TcpClient::init()
+bool UdpClient::init()
 {
 	strcpy(_localIp,"");
 	_localPort = 0;
@@ -23,7 +23,7 @@ bool TcpClient::init()
 	return true;
 }
 
-bool TcpClient::init(const char* localIp, u16 localPort)
+bool UdpClient::init(const char* localIp, u16 localPort)
 {
 
 	if(NULL == localIp)
@@ -34,7 +34,7 @@ bool TcpClient::init(const char* localIp, u16 localPort)
 	strcpy(_localIp,localIp);
 	_localPort = localPort;
 
-	_sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	_sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	if (-1 == _sockfd)
 	{
 		printf("error:%s %d",__FILE__, __LINE__);
@@ -49,22 +49,30 @@ bool TcpClient::init(const char* localIp, u16 localPort)
 	return true;
 }
 
-bool TcpClient::setSocketBlock()
+bool UdpClient::setSocketBlock()
 {
 	fcntl(_sockfd, F_SETFL, fcntl(_sockfd, F_GETFL) & ~O_NONBLOCK);
 	fcntl(_sockfd, F_SETFD, FD_CLOEXEC);
 	return true;
 }
 
-bool TcpClient::setSocketNonblock()
+bool UdpClient::setSocketNonblock()
 {
 	fcntl(_sockfd, F_SETFL, fcntl(_sockfd, F_GETFL) | O_NONBLOCK);
 	return true;
 }
 
-bool TcpClient::conn(const char* servIp, u16 servPort)
+bool UdpClient::conn(u16 servPort)
 {
 	if( -1 == _sockfd )
+	{
+		_bConnected = false;
+		printf("error:%s %d",__FILE__, __LINE__);
+		return false;
+	}
+	
+	const int opt = 1;
+	if(-1 == setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (char *)&opt, sizeof(opt)))
 	{
 		_bConnected = false;
 		printf("error:%s %d",__FILE__, __LINE__);
@@ -73,21 +81,14 @@ bool TcpClient::conn(const char* servIp, u16 servPort)
 
 	_serverAddr.sin_family = AF_INET;
 	_serverAddr.sin_port = htons(servPort);
-	_serverAddr.sin_addr.s_addr = inet_addr(servIp);
+	_serverAddr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
 	bzero(&(_serverAddr.sin_zero), 8);
-
-	if(-1 == connect(_sockfd, (struct sockaddr*)&_serverAddr, sizeof(struct sockaddr)))
-	{
-		printf("Connect: %s failed!\n",inet_ntoa(_serverAddr.sin_addr));
-		//disConn();
-		return false;
-	}
 
 	_bConnected = true;
 	return true;
 }
 
-bool TcpClient::disConn()
+bool UdpClient::disConn()
 {
 	printf("Sockfd = %d,connecte status= %d, now disconnect socket....\n",_sockfd,_bConnected);
 	shutdown(_sockfd, SHUT_RDWR);
@@ -97,7 +98,7 @@ bool TcpClient::disConn()
 	return true;
 }
 
-bool TcpClient::readData(u8 *buf,u32 len)
+bool UdpClient::readData(u8 *buf,u32 len)
 {
 	if(len > MAXDATASIZE)
 		len = MAXDATASIZE;
@@ -109,7 +110,7 @@ bool TcpClient::readData(u8 *buf,u32 len)
 	return true;
 }
 
-bool TcpClient::writeData(const u8 *buf,u32 len)
+bool UdpClient::writeData(const u8 *buf,u32 len)
 {
 	if(len > MAXDATASIZE)
 		len = MAXDATASIZE;

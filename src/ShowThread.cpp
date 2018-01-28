@@ -4,13 +4,8 @@
 #include "sendThread.h"
 #include "recvThread.h"
 
-static G_state game_state = GAME_OVER;
-static Mode game_mode = MODE_UNKNOW;
 
-G_state getGameState()
-{
-	return game_state;
-}
+static Mode game_mode = MODE_UNKNOW;
 
 Mode getGameMode()
 {
