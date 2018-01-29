@@ -1,13 +1,14 @@
 #ifndef RECV_THREAD_H__
 #define RECV_THREAD_H__
 
-#include "thread.h"
-#include "socket.h"
+#include "Thread.h"
+#include "Socket.h"
 
 class RecvThread : public Thread
 {
 public:
-	RecvThread(Socket* pSock);
+	RecvThread();
+	bool init(Socket* pSock);
 	
 protected:
 	virtual void run();

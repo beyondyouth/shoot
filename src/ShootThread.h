@@ -1,9 +1,9 @@
 #ifndef SHOOT_THREAD_H__
 #define SHOOT_THREAD_H__
 
-#include "thread.h"
-#include "tcp_server.h"
-#include "tcp_client.h"
+#include "Thread.h"
+#include "TcpServer.h"
+#include "TcpClient.h"
 
 #define SERVER 1
 #define CLIENT 2
@@ -12,6 +12,7 @@
 class ShootThread : public Thread
 {
 public:
+	ShootThread();
 	~ShootThread();
 	int init(u8 type);
 	static int create_room(void);
@@ -24,8 +25,6 @@ protected:
 	
 private:
 	u8 _type;
-	static ShootThread* p;
-	ShootThread();
 };
 
 #endif/*SHOOT_THREAD_H__*/

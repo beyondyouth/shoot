@@ -1,11 +1,15 @@
-#include "recvThread.h"
+#include "RecvThread.h"
 
 static u8 _recvbuf[MAXDATASIZE];
 static u32 _buflen = MAXDATASIZE;
 
 extern void setLinkState(L_state s);
 
-RecvThread::RecvThread(Socket* pSock)
+RecvThread::RecvThread()
+{
+}
+
+bool RecvThread::init(Socket* pSock)
 {
 	_Sock = pSock;
 }

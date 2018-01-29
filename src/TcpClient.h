@@ -1,7 +1,7 @@
 #ifndef TCP_CLIENT_H__
 #define TCP_CLIENT_H__
 
-#include "socket.h"
+#include "Socket.h"
 
 class TcpClient : public Socket
 {

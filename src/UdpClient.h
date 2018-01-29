@@ -1,7 +1,7 @@
 #ifndef UDP_CLIENT_H__
 #define UDP_CLIENT_H__
 
-#include "socket.h"
+#include "Socket.h"
 
 class UdpClient : public Socket
 {

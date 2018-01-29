@@ -1,6 +1,6 @@
-#include "shootThread.h"
-#include "sendThread.h"
-#include "recvThread.h"
+#include "ShootThread.h"
+#include "SendThread.h"
+#include "RecvThread.h"
 #include <string.h>
 
 static L_state link_state = LINK_FAILED;
@@ -11,31 +11,21 @@ L_state getLinkState()
 
 void setLinkState(L_state s)
 {
-	link_state = s;
-}
-
-ShootThread* ShootThread::p = NULL;
-
-ShootThread* ShootThread::getInstance()
-{
-	if(p == NULL)
-		p = new ShootThread;
-    return p;
+	//link_state = s;
 }
 
 ShootThread::ShootThread()
 {
-	_type = getGameMode();
+	//_type = getGameMode();
 }
 
 ShootThread::~ShootThread()
 {
-	delete p;
 }
 
 void ShootThread::run()
 {
-	if(MODE_SERVER == _type)
+/*	if(MODE_CREATE == _type)
 	{
 		TcpServer InsServer;
 		if(false == InsServer.init("192.168.99.129", 8817))//192.168.99.129
@@ -54,7 +44,7 @@ void ShootThread::run()
 		InsRecv.wait();
 		InsSend.wait();
 	}
-	else if(MODE_CLIENT == _type)
+	else if(MODE_JOIN == _type)
 	{
 		TcpClient InsClient;
 		if(false == InsClient.init())
@@ -75,4 +65,5 @@ void ShootThread::run()
 		InsRecv.wait();
 		InsSend.wait();
 	}
+*/
 }

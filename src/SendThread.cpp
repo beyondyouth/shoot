@@ -1,13 +1,18 @@
-#include "sendThread.h"
+#include "SendThread.h"
 
 static u8* _sendbuf = NULL;
 static u32 _buflen = MAXDATASIZE;
 
 extern void setLinkState(L_state s);
 
-SendThread::SendThread(Socket* pSock)
+SendThread::SendThread()
+{
+}
+
+bool SendThread::init(Socket* pSock)
 {
 	_Sock = pSock;
+	return true;
 }
 
 void SendThread::run()

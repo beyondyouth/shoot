@@ -1,14 +1,14 @@
 #ifndef SEND_THREAD_H__
 #define SEND_THREAD_H__
 
-#include "thread.h"
-#include "socket.h"
+#include "Thread.h"
+#include "Socket.h"
 
 class SendThread : public Thread
 {
 public:
-	SendThread(Socket* pSock);
-	
+	SendThread();
+	bool init(Socket* pSock);
 protected:
 	virtual void run();
 	

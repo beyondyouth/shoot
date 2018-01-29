@@ -2,7 +2,7 @@
 #include <errno.h>
 #include <signal.h>
 
-#include "thread.h"
+#include "Thread.h"
 
 #define THREAD_SUCCES 0
 #define THREADID_NO_INIT 0

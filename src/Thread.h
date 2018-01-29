@@ -4,7 +4,7 @@
 #include <string>
 #include <unistd.h>
 #include <pthread.h>
-#include "common.h"
+#include "Common.h"
 
 #define STATUS_OK 0
 #define STATUS_ERROR -1

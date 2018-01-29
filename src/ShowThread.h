@@ -4,10 +4,10 @@
 #include <string.h>
 #include <ncurses.h>
 #include <ctype.h>
-#include "thread.h"
+#include "Thread.h"
 
 
-class MapThread : public Thread
+class ShowThread : public Thread
 {
 
 public:

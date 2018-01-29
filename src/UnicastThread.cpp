@@ -10,6 +10,6 @@ UnicastThread::~UnicastThread()
 
 void UnicastThread::run()
 {
-	Udp_Client InsUdp = new Udp_Client();
+//	Udp_Client InsUdp = new UdpClient();
 	
 }

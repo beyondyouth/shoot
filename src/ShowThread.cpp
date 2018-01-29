@@ -1,8 +1,8 @@
 #include <stdlib.h>
-#include "mapThread.h"
-#include "shootThread.h"
-#include "sendThread.h"
-#include "recvThread.h"
+#include "ShowThread.h"
+#include "ShootThread.h"
+#include "SendThread.h"
+#include "RecvThread.h"
 
 
 static Mode game_mode = MODE_UNKNOW;
@@ -21,7 +21,7 @@ static char* item[] =
 
 static int sum_item = sizeof(item)/sizeof(item[0]);
 
-bool MapThread::init()
+bool ShowThread::init()
 {
 	initscr();
 	cbreak();/*行缓冲禁止，传递所有控制信息*/
@@ -29,11 +29,10 @@ bool MapThread::init()
 	curs_set(0);/*隐藏光标*/
 	bzero(localData, 6);
 	bzero(remoteData, 6);
-	game_state = GAME_MENU;
 	return true;
 }
 
-WINDOW* MapThread::create_newwin(int height,int width,int starty,int startx)
+WINDOW* ShowThread::create_newwin(int height,int width,int starty,int startx)
 {
 	WINDOW* local_win;
 	local_win = newwin(height,width,starty,startx);
@@ -42,17 +41,18 @@ WINDOW* MapThread::create_newwin(int height,int width,int starty,int startx)
 	return local_win;
 }
 
-void MapThread::destroy_win(WINDOW* local_win)
+void ShowThread::destroy_win(WINDOW* local_win)
 {
 	wborder(local_win,' ',' ',' ',' ',' ',' ',' ',' ');
 	wrefresh(local_win);
 	delwin(local_win);
 }
 
-void MapThread::home()
+void ShowThread::home()
 {
+	/*
 	int ch = 0, i = -1;
-	if(GAME_MENU != game_state)
+	if(GAME_MAINMENU != getGameState())
 		return;
 	
 	for(int i = 0; i < sum_item; i++)
@@ -60,7 +60,7 @@ void MapThread::home()
 		mvprintw((LINES - sum_item)/2 + i, (COLS-strlen(item[i]))/2, "%s", item[i]);
 	}
 	
-	while(GAME_MENU == game_state)
+	while(GAME_MAINMENU == game_state)
 	{
 		ch = getch();
 		if(KEY_F(1) == ch)
@@ -122,11 +122,12 @@ void MapThread::home()
 		pInsShoot->start();
 		return;
 	}
+	*/
 }
 
-void MapThread::lobby()
+void ShowThread::lobby()
 {
-	int ch = 0;
+/*	int ch = 0;
 	char str[] = "waiting...";
 	mvprintw(LINES - 1, (COLS-strlen(str))/2, "%s", str);
 	if(GAME_WAIT != game_state)
@@ -141,10 +142,12 @@ void MapThread::lobby()
 	}
 	if(GAME_READY == game_state)
 		game_state = GAME_FIGHT;
+*/
 }
 
-void MapThread::fight()
+void ShowThread::fight()
 {
+#if 0
 	if(GAME_FIGHT != game_state)
 		return;
 	WINDOW* game_win;
@@ -158,9 +161,10 @@ void MapThread::fight()
 	game_win = create_newwin(height,width,starty,startx);
 	
 	respond(game_win);
+#endif
 }
 
-void MapThread::exit()
+void ShowThread::exit()
 {
 	refresh();
 	endwin();
@@ -168,9 +172,9 @@ void MapThread::exit()
 
 WINDOW* my_win = NULL;
 
-bool MapThread::respond(WINDOW* local_win)
+bool ShowThread::respond(WINDOW* local_win)
 {
-	int ch = 0, c = COLS/2, l = LINES/2;
+/*	int ch = 0, c = COLS/2, l = LINES/2;
 	int iX_local = COLS/2, iY_local = COLS/2;
 	static int iX_local_org = COLS/2, iY_local_org = LINES/2;
 	char sX_local[3] = {0}, sY_local[3] = {0};
@@ -223,10 +227,12 @@ bool MapThread::respond(WINDOW* local_win)
 //		mvprintw(0, 50, "%d", ch);
 	}
 	return true;
+	*/
 }
 
-void MapThread::run()
+void ShowThread::run()
 {
+	/*
 	int iX_remote = COLS/2, iY_remote = LINES/2;
 	static int iX_remote_org = COLS/2, iY_remote_org = LINES/2;
 	static int count = 0;
@@ -254,7 +260,9 @@ void MapThread::run()
 			else
 				mvprintw(LINES - 1, (COLS-strlen("                    "))/2, "%s", "                    ");	
 		}
+		*/
 		/*Map update*/
+		/*
 		writeData((u8*)localData, 6);
 		readData((u8*)remoteData, 6);
 		
@@ -284,4 +292,5 @@ void MapThread::run()
 		msleep(50);
 		refresh();
 	}
+	*/
 }

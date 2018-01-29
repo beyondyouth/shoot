@@ -1,11 +1,12 @@
 #include "MonitorThread.h"
 #include "ShowThread.h"
 #include "KeyThread.h"
-#include "BroadcastThread.h"
+#include "ScanThread.h"
 #include "UnicastThread.h"
 #include "SendThread.h"
 #include "RecvThread.h"
 
+bool advance_state = false;
 
 static G_state game_state = GAME_EXIT;
 
@@ -23,7 +24,7 @@ MonitorThread::~MonitorThread()
 {
 }
 
-void MonitorThread::setAdvance()
+void setAdvance()
 {
 	advance_state = true;
 }
@@ -31,6 +32,13 @@ void MonitorThread::setAdvance()
 void MonitorThread::run()
 {
 	game_state = GAME_START;
+	ShowThread* pInsShow = NULL;
+	KeyThread* pInsKey = NULL;
+	ScanThread* pInsScan = NULL;
+	UnicastThread* pInsUnicast = NULL;
+	SendThread* pInsSend = NULL;
+	RecvThread* pInsRecv = NULL;
+	
 	while(GAME_EXIT != game_state)
 	{
 		if(GAME_START == game_state && true == advance_state)
@@ -38,41 +46,38 @@ void MonitorThread::run()
 			game_state = GAME_MAINMENU;
 			advance_state = false;
 			/*更新界面线程启动*/
-			ShowThread InsShow = new ShowThread();
-			InsShow.start();
+			pInsShow = new ShowThread();
+			pInsShow->start();
 			/*获取按键线程启动*/
-			KeyThread InsKey = new KeyThread();
-			InsKey.start();				
+			pInsKey = new KeyThread();
+			pInsKey->start();				
 		}
 		if(GAME_MAINMENU == game_state && true == advance_state)
 		{
 			game_state = GAME_SCANING;
 			advance_state = false;
-			/*广播线程启动*/
-			BroadcastThread InsBroadcast = new BroadcastThread();
-			InsBroadcast.start();
+			/*扫描线程启动*/
+			pInsScan = new ScanThread();
+			pInsScan->start();
 		}
 		if(GAME_SCANING == game_state && true == advance_state)
 		{
 			game_state = GAME_LINKING;
 			advance_state = false;
-			/*广播线程终止*/
-			if(NULL != InsBroadcast)
-				delete InsBroadcast;
-			/*单播线程启动*/
-			UnicastThread InsUnicast = new UnicastThread();
-			InsUnicast.start();
+			/*tcp线程启动*/
+			pInsUnicast = new UnicastThread();
+			pInsUnicast->start();
 		}
 		if(GAME_LINKING == game_state && true == advance_state)
 		{
 			game_state = GAME_READY;
 			advance_state = false;
 			/*发送线程启动*/
-			SendThread InsSend = new SendThread();
-			InsSend.start();
+			pInsSend = new SendThread();
+			pInsSend->start();
 			/*接收线程启动*/
-			RecvThread InsRecv = new RecvThread();
-			InsRecv.start();
+			pInsRecv = new RecvThread();
+			pInsRecv->start();
 		}
 		if(GAME_READY == game_state && true == advance_state)
 		{
@@ -84,12 +89,12 @@ void MonitorThread::run()
 			game_state = GAME_OVER;
 			advance_state = false;
 			/**/
-			if(NULL != InsSend)
-				delete InsSend;
-			if(NULL != InsRecv)
-				delete InsRecv;
-			if(NULL != InsUnicast)
-				delete InsUnicast;
+			if(NULL != pInsSend)
+				delete pInsSend;
+			if(NULL != pInsRecv)
+				delete pInsRecv;
+			if(NULL != pInsUnicast)
+				delete pInsUnicast;
 
 		}
 		if(GAME_OVER == game_state && true == advance_state)
@@ -99,10 +104,12 @@ void MonitorThread::run()
 		}
 		msleep(50);
 	}
-	if(NULL != InsShow)
-		delete InsShow;
-	if(NULL != InsKey)
-		delete InsKey;
+	if(NULL != pInsShow)
+		delete pInsShow;
+	if(NULL != pInsKey)
+		delete pInsKey;
+	if(NULL != pInsScan)
+		delete pInsScan;
 	
 }
 

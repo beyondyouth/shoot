@@ -1,9 +1,9 @@
-#if 1
+#if 0
 
 #include <stdio.h>
-#include "monitorThread.h"
+#include "MonitorThread.h"
 
-int main(int argc, char* argv[])
+int main()
 {
 /*	MapThread InsMap;
 	InsMap.init();//curses初始化，进入curses界面
@@ -21,72 +21,55 @@ int main(int argc, char* argv[])
 
 
 #else
-
-#include <ctype.h>
-#include <ncurses.h>
-
-WINDOW* create_newwin(int height,int width,int starty,int startx);
-void destroy_win(WINDOW* local_win);
-int main(int argc,char* argv[])
+/*
+#include "UdpServer.h"
+	
+	
+int main()
 {
-	WINDOW* my_win;
-	int startx,starty,width,height;
-	int ch;
-	initscr();
-	cbreak();/*行缓冲禁止，传递所有控制信息*/
-	keypad(stdscr,TRUE);/*程序需要使用F1功能键*/
-	height=3;
-	width=10;
-	starty=(LINES-height)/2;/*计算窗口中心位置的行数*/
-	startx=(COLS-width)/2;/*计算窗口中心位置的列数*/
-	printw("PressF1toexit");
-	refresh();
-	my_win=create_newwin(height,width,starty,startx);
-
-	while((ch=getch())!=KEY_F(1))
+	u8 buf[256] = {0};
+	UdpServer* pInsUdp = NULL;
+	pInsUdp = new UdpServer();
+	pInsUdp->init("192.168.99.128", 8817);
+	pInsUdp->acceptConn(8817);
+	
+	for(int i = 0; i < 20; i++)
 	{
-		switch(ch)
-		{
-			case KEY_LEFT:
-				destroy_win(my_win);
-				my_win=create_newwin(height,width,starty,--startx);
-				break;
-			case KEY_RIGHT:
-				destroy_win(my_win);
-				my_win=create_newwin(height,width,starty,++startx);
-				break;
-			case KEY_UP:
-				destroy_win(my_win);
-				my_win=create_newwin(height,width,--starty,startx);
-				break;
-			case KEY_DOWN:
-				destroy_win(my_win);
-				my_win=create_newwin(height,width,++starty,startx);
-				break;
-		}
-		mvwprintw(my_win, 1, 3, "hello");
-		wrefresh(my_win);
+		pInsUdp->readData(buf, 256);
+		if(0 != buf[0])
+			printf("RecvData:%s\n", buf);
+		sleep(2);
 	}
-	endwin();/*结束curses模式*/
+	pInsUdp->closeConn();
+	if(NULL != pInsUdp)
+		delete pInsUdp;
 	return 0;
 }
 
-WINDOW* create_newwin(int height,int width,int starty,int startx)
-{
-	WINDOW* local_win;
-	local_win = newwin(height,width,starty,startx);
-	box(local_win, 0, 0);/*0,0是字符默认的行列起始位置*/
-	wrefresh(local_win);/*刷新窗口缓冲，显示box*/
-	return local_win;
-}
+*/
 
-void destroy_win(WINDOW* local_win)
+#include "UdpClient.h"
+int main()
 {
-	wborder(local_win,' ',' ',' ',' ',' ',' ',' ',' ');
-	wrefresh(local_win);
-	delwin(local_win);
+	u8 buf[256] = {"hello"};
+	UdpClient* pInsUdp = NULL;
+	pInsUdp = new UdpClient();
+	pInsUdp->init("192.168.99.128", 8817);
+	pInsUdp->conn(8817);
+	
+	for(int i = 0; i < 20; i++)
+	{
+		pInsUdp->writeData(buf, 256);
+		if(0 != buf[0])
+			printf("sendData:%s\n", buf);
+		sleep(2);
+	}
+	pInsUdp->disConn();
+	if(NULL != pInsUdp)
+		delete pInsUdp;
+	return 0;
 }
-
 
 
 #endif
+

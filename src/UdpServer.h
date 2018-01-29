@@ -1,7 +1,7 @@
 #ifndef UDP_SERVER_H__
 #define UDP_SERVER_H__
 
-#include "socket.h"
+#include "Socket.h"
 
 class UdpServer : public Socket
 {
@@ -14,9 +14,11 @@ public:
 	virtual bool writeData(const u8 *buf, u32 len);
 	virtual bool setSocketBlock();
 	virtual bool setSocketNonblock();
+	bool closeConn();
 	
 	bool acceptConn(u16 localPort);
-
+private:
+	int _client_sockfd;
 };
 
 

@@ -1,7 +1,7 @@
 #ifndef TCP_SERVER_H__
 #define TCP_SERVER_H__
 
-#include "socket.h"
+#include "Socket.h"
 
 class TcpServer : public Socket
 {

@@ -8,7 +8,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
-#include "common.h"
+#include "Common.h"
 
 #define MAXDATASIZE 256
 
