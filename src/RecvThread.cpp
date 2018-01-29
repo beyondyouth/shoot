@@ -1,7 +1,10 @@
 #include "RecvThread.h"
 
-static u8 _recvbuf[MAXDATASIZE];
+static u8 _recvActBuf[MAXDATASIZE];
+static u8 _recvCmdBuf[MAXDATASIZE];
 static u32 _buflen = MAXDATASIZE;
+
+remoteData
 
 extern void setLinkState(L_state s);
 
@@ -26,21 +29,40 @@ void RecvThread::run()
 			printf("error:%s %d",__FILE__, __LINE__);
 			setLinkState(LINK_ABORT);
 		}
-		if(0 != tempbuf[0])
+		switch(tempbuf[0])
 		{
-			memcpy(_recvbuf, tempbuf, MAXDATASIZE);
-			bzero(tempbuf, MAXDATASIZE);
+			case 'a':
+			{
+				memcpy(_recvActBuf, tempbuf + 1, MAXDATASIZE - 1);
+				bzero(tempbuf, MAXDATASIZE);
+				break;
+			}
+			case 'c':
+			{
+				memcpy(_recvCmdBuf, tempbuf + 1, MAXDATASIZE - 1);
+				bzero(tempbuf, MAXDATASIZE);
+				break;
+			}
 		}
+		
 		msleep(50);
 	}
 }
 
-void readData(u8* buf, u32 len)
+void readActData(u8* buf, u32 len)
 {
-	if(NULL != _recvbuf)
+	if(NULL != _recvActBuf)
 	{
-		memcpy(buf, _recvbuf, len);
-		bzero(_recvbuf, MAXDATASIZE);
+		memcpy(buf, _recvActBuf, len);
+		bzero(_recvActBuf, MAXDATASIZE);
 	}
 }
 
+void readCmdData(u8* buf, u32 len)
+{
+	if(NULL != _recvCmdBuf)
+	{
+		memcpy(buf, _recvCmdBuf, len);
+		bzero(_recvCmdBuf, MAXDATASIZE);
+	}
+}

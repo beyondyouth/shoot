@@ -26,7 +26,7 @@ protected:
 private:
 	u8 localData[6];
 	u8 remoteData[6];
-	
+	WINDOW* childWin;
 };
 
 u8 getGame_state(void);

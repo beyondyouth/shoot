@@ -52,6 +52,8 @@ void MonitorThread::run()
 			pInsKey = new KeyThread();
 			pInsKey->start();				
 		}
+		
+#if 0
 		if(GAME_MAINMENU == game_state && true == advance_state)
 		{
 			game_state = GAME_SCANING;
@@ -60,7 +62,9 @@ void MonitorThread::run()
 			pInsScan = new ScanThread();
 			pInsScan->start();
 		}
-		if(GAME_SCANING == game_state && true == advance_state)
+		
+#endif
+		if(GAME_MAINMENU == game_state && true == advance_state)
 		{
 			game_state = GAME_LINKING;
 			advance_state = false;

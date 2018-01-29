@@ -1,18 +1,10 @@
-#if 0
+#if 1
 
 #include <stdio.h>
 #include "MonitorThread.h"
 
 int main()
 {
-/*	MapThread InsMap;
-	InsMap.init();//curses初始化，进入curses界面
-	InsMap.start();//开始界面刷新线程，可用于调式
-	InsMap.home();//主界面
-	InsMap.lobby();//大厅
-	InsMap.fight();//游戏界面
-	InsMap.exit();//退出游戏
-*/
 	monitorThread InsMonitor;
 	InsMonitor.start();
 	InsMonitor.wait();
@@ -21,6 +13,7 @@ int main()
 
 
 #else
+
 /*
 #include "UdpServer.h"
 	
