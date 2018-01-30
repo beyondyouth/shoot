@@ -1,15 +1,43 @@
 #include "KeyThread.h"
 
-static int key_value = 0;
-int iX_local = COLS/2, iY_local = COLS/2;
-char sX_local[3] = {0}, sY_local[3] = {0};
+static u8 _LocBuf[MAXDATASIZE];
 
-int getKeyValue()
+int getItemNum()
 {
-	int temp = key_value;
-	key_value = 0;
-	return temp;
+	return 0;
 }
+
+static Mutex* pLocMux = new Mutex();
+
+//extern void setLinkState(L_state s);
+
+bool readLocData(u8* buf, u32 len, u32 offset = 0)
+{
+	pLocMux->lock();
+	if(offset + len > MAXDATASIZE)
+	{
+		pLocMux->unlock();
+		return false;
+	}
+	memcpy(buf, _LocBuf + offset, len);
+	pLocMux->unlock();
+	return true;
+}
+
+static bool writeLocData(u8* buf, u32 len, u32 offset = 0)
+{
+	pActMux->lock();
+	if(offset + len > MAXDATASIZE)
+	{
+		pActMux->unlock();
+		return false;
+	}
+	memcpy(_LocBuf + offset, buf, len);
+	pActMux->unlock();
+	return true;
+}
+
+
 
 void KeyThread::run()
 {
@@ -21,6 +49,19 @@ void KeyThread::run()
 		switch(game_state)
 		{
 			case GAME_MAINMENU:
+			{
+				switch (key_value)
+				{
+					case KEY_DOWN:
+					{
+						break;
+					}
+					case KEY_UP:
+					{
+						break;
+					}
+				}
+			}
 				break;
 			case GAME_FIGHT:
 			{
@@ -41,14 +82,17 @@ void KeyThread::run()
 					default:
 						break;
 				}
-				/*if localData changed*/
+				/*if _LocBuf changed*/
 				if(iY_local_org != iY_local || iX_local_org != iX_local)
 				{
-					sprintf((char*)localData, "%03d%03d", iX_local, iY_local);
+					sprintf((char*)_LocBuf, "%03d%03d", iX_local, iY_local);
 					iX_local_org = iX_local;
 					iY_local_org = iY_local;
 				}
-				writeData((u8*)localData, 6);
+				
+				writeLocData((u8*)_LocBuf, 6);
+				//writeData((u8*)_LocBuf, 6);
+				
 				break;
 			}
 		}

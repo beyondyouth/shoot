@@ -4,16 +4,16 @@
 #include "SendThread.h"
 #include "RecvThread.h"
 
-
-static Mode game_mode = MODE_UNKNOW;
+extern bool readCmdData(u8* buf, u32 len, u32 offset = 0);
+extern bool readActData(u8* buf, u32 len, u32 offset = 0);
+extern int getItemNum();
 
 int iX_remote = COLS/2, iY_remote = LINES/2;
 char sX_remote[3] = {0}, sY_remote[3] = {0};
 
-Mode getGameMode()
-{
-	return game_mode;
-}
+int iX_local = COLS/2, iY_local = COLS/2;
+char sX_local[3] = {0}, sY_local[3] = {0};
+
 
 static char* item[] = 
 {
@@ -54,8 +54,6 @@ void ShowThread::destroy_win(WINDOW* local_win)
 
 void ShowThread::home()
 {
-	int ch = 0, i = -1;
-	
 	for(int i = 0; i < sum_item; i++)
 	{
 		mvprintw((LINES - sum_item)/2 + i, (COLS-strlen(item[i]))/2, "%s", item[i]);/*显示主菜单*/
@@ -89,17 +87,16 @@ void ShowThread::run()
 {
 	int iX_remote_org = COLS/2, iY_remote_org = LINES/2;
 	init();
-	while(GAME_EXIT != game_state)
+	while(GAME_EXIT != getGameState())
 	{
-		ch = getKeyValue();
-		switch(game_state)
+		switch(getGameState())
 		{
 			case GAME_MAINMENU:
 			{
 				home();
 				for(int j = 0; j < sum_item; j++)
 				{
-					if(j == i)
+					if(j == getItemNum())
 					{
 						attron(A_BOLD);
 					}
@@ -111,14 +108,17 @@ void ShowThread::run()
 			case GAME_FIGHT:
 			{
 				fight();
-				memcpy(sX_remote, remoteData, 3);
-				memcpy(sY_remote, remoteData + 3, 3);
+				if(false == readActData((u8*)sX_remote, 3, 0))
+					break;
+				if(false == readActData((u8*)sY_remote, 3, 3))
+					break;
+				
 				iX_remote = atoi(sX_remote);
 				iY_remote = atoi(sY_remote);
 				if(iY_remote_org != iY_remote || iX_remote_org != iX_remote)
 				{
-					mvwprintw(my_win, iY_remote_org, iX_remote_org, " ");
-					mvwprintw(my_win, iY_remote, iX_remote, "r");
+					mvwprintw(childWin, iY_remote_org, iX_remote_org, " ");
+					mvwprintw(childWin, iY_remote, iX_remote, "r");
 					
 					iX_remote_org = iX_remote;
 					iY_remote_org = iY_remote;

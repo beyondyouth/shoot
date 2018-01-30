@@ -1,12 +1,65 @@
 #include "RecvThread.h"
+#include "Mutex.h"
 
 static u8 _recvActBuf[MAXDATASIZE];
 static u8 _recvCmdBuf[MAXDATASIZE];
-static u32 _buflen = MAXDATASIZE;
 
-remoteData
+static Mutex* pActMux = new Mutex();
+static Mutex* pCmdMux = new Mutex();
 
-extern void setLinkState(L_state s);
+//extern void setLinkState(L_state s);
+
+bool readActData(u8* buf, u32 len, u32 offset = 0)
+{
+	pActMux->lock();
+	if(offset + len > MAXDATASIZE)
+	{
+		pActMux->unlock();
+		return false;
+	}
+	memcpy(buf, _recvActBuf + offset, len);
+	pActMux->unlock();
+	return true;
+}
+
+bool readCmdData(u8* buf, u32 len, u32 offset = 0)
+{
+	pCmdMux->lock();
+	if(offset + len > MAXDATASIZE)
+	{
+		pCmdMux->unlock();
+		return false;
+	}
+	memcpy(buf, _recvCmdBuf + offset, len);
+	pCmdMux->unlock();
+	return true;
+}
+
+static bool writeActData(u8* buf, u32 len, u32 offset = 0)
+{
+	pActMux->lock();
+	if(offset + len > MAXDATASIZE)
+	{
+		pActMux->unlock();
+		return false;
+	}
+	memcpy(_recvActBuf + offset, buf, len);
+	pActMux->unlock();
+	return true;
+}
+
+static bool writeCmdData(u8* buf, u32 len, u32 offset = 0)
+{
+	pCmdMux->lock();
+	if(offset + len > MAXDATASIZE)
+	{
+		pCmdMux->unlock();
+		return false;
+	}
+	memcpy(_recvCmdBuf + offset, buf, len);
+	pCmdMux->unlock();
+	return true;
+}
 
 RecvThread::RecvThread()
 {
@@ -27,19 +80,19 @@ void RecvThread::run()
 		if(false == _Sock->readData(tempbuf, _buflen))
 		{
 			printf("error:%s %d",__FILE__, __LINE__);
-			setLinkState(LINK_ABORT);
+//			setLinkState(LINK_ABORT);
 		}
 		switch(tempbuf[0])
 		{
 			case 'a':
 			{
-				memcpy(_recvActBuf, tempbuf + 1, MAXDATASIZE - 1);
+				writeActData(tempbuf + 1, MAXDATASIZE - 1);
 				bzero(tempbuf, MAXDATASIZE);
 				break;
 			}
 			case 'c':
 			{
-				memcpy(_recvCmdBuf, tempbuf + 1, MAXDATASIZE - 1);
+				writeCmdData(tempbuf + 1, MAXDATASIZE - 1);
 				bzero(tempbuf, MAXDATASIZE);
 				break;
 			}
@@ -49,20 +102,3 @@ void RecvThread::run()
 	}
 }
 
-void readActData(u8* buf, u32 len)
-{
-	if(NULL != _recvActBuf)
-	{
-		memcpy(buf, _recvActBuf, len);
-		bzero(_recvActBuf, MAXDATASIZE);
-	}
-}
-
-void readCmdData(u8* buf, u32 len)
-{
-	if(NULL != _recvCmdBuf)
-	{
-		memcpy(buf, _recvCmdBuf, len);
-		bzero(_recvCmdBuf, MAXDATASIZE);
-	}
-}

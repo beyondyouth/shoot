@@ -15,9 +15,12 @@ protected:
 	
 private:
 	Socket* _Sock;
+	const u32 _buflen = MAXDATASIZE;
 };
 
-void readData(u8* buf, u32 len);
+bool readActData(u8* buf, u32 len);
+
+bool readCmdData(u8* buf, u32 len);
 
 #endif/*RECV_THREAD_H__*/
 
