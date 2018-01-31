@@ -5,7 +5,7 @@
 #include "Mutex.h"
 
 static u8 _LocBuf[MAXDATASIZE];
-static int menu_order = -1;
+static int menu_order = 0;
 
 int getItemNum()
 {
@@ -52,10 +52,13 @@ void KeyThread::run()
 	int iX_local_org = COLS/2, iY_local_org = LINES/2;
 	int key_value;
 	int sum_item = getItemLen();
-	G_state game_state;
-	while(GAME_EXIT == (game_state = getGameState()))
+	G_state game_state = getGameState();
+	mvprintw(0, (COLS-strlen("---------------------1--------------------"))/2, "---------------------1--------------------");
+	while(1)
 	{
 		key_value = getch();
+		mvprintw(0, (COLS-strlen("---------------------2--------------------"))/2, "---------------------2--------------------");
+		mvprintw(1, (COLS-strlen("key_value = 1"))/2, "key_value = %d", key_value);
 		switch(game_state)
 		{
 			case GAME_MAINMENU:
@@ -77,6 +80,8 @@ void KeyThread::run()
 					default:
 						break;
 				}
+				
+				mvprintw(2, (COLS-strlen("menu_order = 1"))/2, "menu_order = %d", menu_order);
 				break;
 			}
 				

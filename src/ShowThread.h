@@ -22,13 +22,11 @@ protected:
 	WINDOW* create_newwin(int height,int width,int starty,int startx);
 	void destroy_win(WINDOW* local_win);
 	bool respond(WINDOW* local_win);
-
+	
 private:
 	u8 localData[6];
 	u8 remoteData[6];
 	WINDOW* childWin;
 };
-
-void debug(char* buffer);
 
 #endif/*MAP_THREAD_H__*/

@@ -108,6 +108,7 @@ void ShowThread::run()
 					mvprintw((LINES - sum_item)/2 + j, (COLS-strlen(item[j]))/2, "%s", item[j]);
 					attroff(A_BOLD);
 				}
+				
 				break;
 			}
 			case GAME_FIGHT:
@@ -135,14 +136,10 @@ void ShowThread::run()
 			
 		}
 		wrefresh(childWin);
-		debug("hello");
 		refresh();
 		sleep(50);
 	}
 }
 
-void debug(char* buffer)
-{
-	
-}
+
 	

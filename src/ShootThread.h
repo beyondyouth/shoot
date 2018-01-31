@@ -22,7 +22,7 @@ public:
 	
 protected:
 	virtual void run();
-	
+
 private:
 	u8 _type;
 };
