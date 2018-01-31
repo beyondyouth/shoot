@@ -24,6 +24,11 @@ static char* item[] =
 
 static int sum_item = sizeof(item)/sizeof(item[0]);
 
+u8 getItemLen()
+{
+	return sum_item;
+}
+
 bool ShowThread::init()
 {
 	initscr();
@@ -125,12 +130,19 @@ void ShowThread::run()
 				}
 				break;
 			}
+			default:
+				break;
 			
 		}
 		wrefresh(childWin);
+		debug("hello");
 		refresh();
 		sleep(50);
 	}
 }
 
+void debug(char* buffer)
+{
+	
+}
 	

@@ -17,14 +17,13 @@ bool SendThread::init(Socket* pSock)
 
 void SendThread::run()
 {
-	while(LINK_SUCCESS == getLinkState() && GAME_OVER != getGameState())
+	while(GAME_OVER != getGameState())
 	{
 		if(0 != _sendbuf[0])
 		{
 			if(false == _Sock->writeData(_sendbuf, _buflen))
 			{
 				printf("error:%s %d",__FILE__, __LINE__);
-				setLinkState(LINK_ABORT);
 			}
 			bzero(_sendbuf, MAXDATASIZE);
 		}

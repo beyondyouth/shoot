@@ -5,7 +5,7 @@
 
 int main()
 {
-	monitorThread InsMonitor;
+	MonitorThread InsMonitor;
 	InsMonitor.start();
 	InsMonitor.wait();
 	return 0;

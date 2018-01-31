@@ -14,34 +14,34 @@ Mutex::Mutex()
 	return;
 }
 
-int Mutex::lock()
+bool Mutex::lock()
 {
 	if (MUTEX_SUCCESS == pthread_mutex_lock(&_mutexId))
 	{
-		return STATUS_OK;
+		return true;
 	}
 	printf(" Mutex Lock Fail, errno = %d ",errno);
-	return STATUS_ERROR;
+	return false;
 }
 
-int Mutex::trylock()
+bool Mutex::trylock()
 {
 	if (MUTEX_SUCCESS == pthread_mutex_trylock(&_mutexId))
 	{
-		return STATUS_OK;
+		return true;
 	}
 	printf(" Mutex Trylock Fail, errno = %d ",errno);
-	return STATUS_ERROR;
+	return false;
 }
 
-int Mutex::unlock()
+bool Mutex::unlock()
 {
 	if (MUTEX_SUCCESS == pthread_mutex_unlock(&_mutexId))
 	{
-		return STATUS_OK;
+		return true;
 	}
 	printf(" Mutex Unlock Fail, errno = %d ",errno);
-	return STATUS_ERROR;
+	return false;
 }
 
 pthread_mutex_t Mutex::getId()

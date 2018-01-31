@@ -1,11 +1,18 @@
+#include <ncurses.h>
+#include <ctype.h>
 #include "KeyThread.h"
+#include "Socket.h"
+#include "Mutex.h"
 
 static u8 _LocBuf[MAXDATASIZE];
+static int menu_order = -1;
 
 int getItemNum()
 {
-	return 0;
+	return menu_order;
 }
+
+extern u8 getItemLen();
 
 static Mutex* pLocMux = new Mutex();
 
@@ -26,14 +33,14 @@ bool readLocData(u8* buf, u32 len, u32 offset = 0)
 
 static bool writeLocData(u8* buf, u32 len, u32 offset = 0)
 {
-	pActMux->lock();
+	pLocMux->lock();
 	if(offset + len > MAXDATASIZE)
 	{
-		pActMux->unlock();
+		pLocMux->unlock();
 		return false;
 	}
 	memcpy(_LocBuf + offset, buf, len);
-	pActMux->unlock();
+	pLocMux->unlock();
 	return true;
 }
 
@@ -41,9 +48,12 @@ static bool writeLocData(u8* buf, u32 len, u32 offset = 0)
 
 void KeyThread::run()
 {
+	static int iX_local = COLS/2, iY_local = LINES/2;
 	int iX_local_org = COLS/2, iY_local_org = LINES/2;
-	
-	while(GAME_EXIT == getGameState())
+	int key_value;
+	int sum_item = getItemLen();
+	G_state game_state;
+	while(GAME_EXIT == (game_state = getGameState()))
 	{
 		key_value = getch();
 		switch(game_state)
@@ -54,15 +64,22 @@ void KeyThread::run()
 				{
 					case KEY_DOWN:
 					{
+						menu_order++;
+						menu_order = menu_order % sum_item;
+						
 						break;
 					}
 					case KEY_UP:
 					{
-						break;
+						menu_order--;
+						menu_order = menu_order % sum_item;
 					}
+					default:
+						break;
 				}
-			}
 				break;
+			}
+				
 			case GAME_FIGHT:
 			{
 				switch (key_value)
@@ -95,6 +112,8 @@ void KeyThread::run()
 				
 				break;
 			}
+			default:
+				break;
 		}
 		sleep(50);
 	}

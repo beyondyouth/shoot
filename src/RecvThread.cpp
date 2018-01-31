@@ -68,13 +68,15 @@ RecvThread::RecvThread()
 bool RecvThread::init(Socket* pSock)
 {
 	_Sock = pSock;
+	_buflen = MAXDATASIZE;
+	return true;
 }
 
 void RecvThread::run()
 {
 	u8 tempbuf[MAXDATASIZE];
 	bzero(tempbuf, MAXDATASIZE);
-	while(LINK_SUCCESS == getLinkState() && GAME_OVER != getGameState())
+	while(GAME_OVER != getGameState())
 	{
 		
 		if(false == _Sock->readData(tempbuf, _buflen))

@@ -38,7 +38,7 @@ void MonitorThread::run()
 	UnicastThread* pInsUnicast = NULL;
 	SendThread* pInsSend = NULL;
 	RecvThread* pInsRecv = NULL;
-	
+	setAdvance();
 	while(GAME_EXIT != game_state)
 	{
 		if(GAME_START == game_state && true == advance_state)
@@ -50,7 +50,7 @@ void MonitorThread::run()
 			pInsShow->start();
 			/*获取按键线程启动*/
 			pInsKey = new KeyThread();
-			pInsKey->start();				
+			pInsKey->start();
 		}
 		
 #if 0

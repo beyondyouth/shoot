@@ -15,7 +15,7 @@ protected:
 	
 private:
 	Socket* _Sock;
-	const u32 _buflen = MAXDATASIZE;
+	u32 _buflen;
 };
 
 bool readActData(u8* buf, u32 len);

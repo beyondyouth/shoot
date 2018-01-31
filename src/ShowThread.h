@@ -29,6 +29,6 @@ private:
 	WINDOW* childWin;
 };
 
-u8 getGame_state(void);
+void debug(char* buffer);
 
 #endif/*MAP_THREAD_H__*/
