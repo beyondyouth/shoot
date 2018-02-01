@@ -22,7 +22,7 @@ void UnicastThread::run()
 		{
 			TcpServer* pInsTcp = new TcpServer();
 			pTcpSock = (Socket*)pInsTcp;
-			pInsTcp->init("192.168.99.128", 8817);
+			pInsTcp->init("10.0.2.15", 8817);
 			pInsTcp->acceptConn();
 			setAdvance();
 			while(GAME_OVER != getGameState())
@@ -39,7 +39,7 @@ void UnicastThread::run()
 			TcpClient* pInsTcp = new TcpClient();
 			pTcpSock = (Socket*)pInsTcp;
 			pInsTcp->init();
-			while(false == pInsTcp->conn("192.168.99.128", 8817))
+			while(false == pInsTcp->conn("10.0.2.15", 8817))
 			{
 				sleep(3);
 			}

@@ -58,7 +58,6 @@ static bool writeLocData(u8* buf, u32 len, u32 offset = 0)
 bool KeyThread::init()
 {
 	system(STTY_US TTY_PATH);
-	game_state = getGameState();
 	return true;
 }
 
@@ -87,7 +86,7 @@ void KeyThread::run()
 	int iX_local_org = COLS/2, iY_local_org = LINES/2;
 	int sum_item = getItemLen();
 
-	while(GAME_EXIT != game_state)
+	while(GAME_EXIT != getGameState())
 	{
 		key_value = get_char();
 		if(key_value == 3)
@@ -97,7 +96,7 @@ void KeyThread::run()
             //system(STTY_DEF TTY_PATH);
             break;
         }
-		switch(game_state)
+		switch(getGameState())
 		{
 			case GAME_MAINMENU:
 			{
@@ -173,9 +172,9 @@ void KeyThread::run()
 					iX_local_org = iX_local;
 					iY_local_org = iY_local;
 				}
-				
+				mvprintw(1, 120, "locbuf:%s", _LocBuf);
 				//writeLocData((u8*)_LocBuf, 6);
-				writeData((u8*)_LocBuf, 6);
+				writeData((u8*)_LocBuf, 7);
 				
 				
 				break;
