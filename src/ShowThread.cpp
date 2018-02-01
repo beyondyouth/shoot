@@ -6,7 +6,7 @@
 
 extern bool readCmdData(u8* buf, u32 len, u32 offset = 0);
 extern bool readActData(u8* buf, u32 len, u32 offset = 0);
-extern int getItemNum();
+extern int getMenuOrder();
 
 int iX_remote = COLS/2, iY_remote = LINES/2;
 char sX_remote[3] = {0}, sY_remote[3] = {0};
@@ -23,6 +23,8 @@ static char* item[] =
 };
 
 static int sum_item = sizeof(item)/sizeof(item[0]);
+
+extern bool readLocData(u8* buf, u32 len, u32 offset = 0);
 
 u8 getItemLen()
 {
@@ -101,7 +103,7 @@ void ShowThread::run()
 				home();
 				for(int j = 0; j < sum_item; j++)
 				{
-					if(j == getItemNum())
+					if(j == getMenuOrder())
 					{
 						attron(A_BOLD);
 					}
@@ -118,27 +120,32 @@ void ShowThread::run()
 					break;
 				if(false == readActData((u8*)sY_remote, 3, 3))
 					break;
-				
+				mvprintw(1, 80, "X:%s Y:%s", sX_remote, sY_remote);
 				iX_remote = atoi(sX_remote);
 				iY_remote = atoi(sY_remote);
 				if(iY_remote_org != iY_remote || iX_remote_org != iX_remote)
 				{
-					mvwprintw(childWin, iY_remote_org, iX_remote_org, " ");
+					//mvwprintw(childWin, iY_remote_org, iX_remote_org, " ");
 					mvwprintw(childWin, iY_remote, iX_remote, "r");
 					
 					iX_remote_org = iX_remote;
 					iY_remote_org = iY_remote;
 				}
+				
+				readLocData((u8*)sX_local, 3, 1);
+				readLocData((u8*)sY_local, 3, 4);
+				mvprintw(1, 10, "X:%s Y:%s", sX_local, sY_local);
+				wrefresh(childWin);
 				break;
 			}
 			default:
 				break;
 			
 		}
-		wrefresh(childWin);
 		refresh();
-		sleep(50);
+		msleep(50);
 	}
+	exit();
 }
 
 

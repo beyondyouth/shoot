@@ -8,12 +8,12 @@ class SendThread : public Thread
 {
 public:
 	SendThread();
-	bool init(Socket* pSock);
+
 protected:
 	virtual void run();
 	
 private:
-	Socket* _Sock;
+	Socket* _pSock;
 };
 
 void writeData(u8* buf, u32 len);

@@ -97,6 +97,14 @@ bool TcpClient::disConn()
 	return true;
 }
 
+bool TcpClient::closeConn()
+{
+	shutdown(_sockfd, SHUT_RDWR);
+	close(_sockfd);
+	_sockfd = -1;
+	return true;
+}
+
 bool TcpClient::readData(u8 *buf,u32 len)
 {
 	if(len > MAXDATASIZE)

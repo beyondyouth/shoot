@@ -1,27 +1,26 @@
 #include "SendThread.h"
 
+#include "ShowThread.h"
+
 static u8* _sendbuf = NULL;
 static u32 _buflen = MAXDATASIZE;
 
+extern Socket* pTcpSock;
 extern void setLinkState(L_state s);
 
 SendThread::SendThread()
 {
-}
-
-bool SendThread::init(Socket* pSock)
-{
-	_Sock = pSock;
-	return true;
+	_pSock = pTcpSock;
+	setAdvance();
 }
 
 void SendThread::run()
 {
 	while(GAME_OVER != getGameState())
-	{
-		if(0 != _sendbuf[0])
+	{	
+		if(NULL != _sendbuf)
 		{
-			if(false == _Sock->writeData(_sendbuf, _buflen))
+			if(false == _pSock->writeData(_sendbuf, _buflen))
 			{
 				printf("error:%s %d",__FILE__, __LINE__);
 			}

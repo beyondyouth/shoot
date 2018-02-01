@@ -1,12 +1,15 @@
 #include "RecvThread.h"
 #include "Mutex.h"
 
+#include "ShowThread.h"
+
 static u8 _recvActBuf[MAXDATASIZE];
 static u8 _recvCmdBuf[MAXDATASIZE];
 
 static Mutex* pActMux = new Mutex();
 static Mutex* pCmdMux = new Mutex();
 
+extern Socket* pTcpSock;
 //extern void setLinkState(L_state s);
 
 bool readActData(u8* buf, u32 len, u32 offset = 0)
@@ -63,13 +66,9 @@ static bool writeCmdData(u8* buf, u32 len, u32 offset = 0)
 
 RecvThread::RecvThread()
 {
-}
-
-bool RecvThread::init(Socket* pSock)
-{
-	_Sock = pSock;
+	_pSock = pTcpSock;
 	_buflen = MAXDATASIZE;
-	return true;
+	setAdvance();
 }
 
 void RecvThread::run()
@@ -78,8 +77,7 @@ void RecvThread::run()
 	bzero(tempbuf, MAXDATASIZE);
 	while(GAME_OVER != getGameState())
 	{
-		
-		if(false == _Sock->readData(tempbuf, _buflen))
+		if(false == _pSock->readData(tempbuf, _buflen))
 		{
 			printf("error:%s %d",__FILE__, __LINE__);
 //			setLinkState(LINK_ABORT);

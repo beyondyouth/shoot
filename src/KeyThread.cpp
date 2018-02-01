@@ -1,22 +1,33 @@
+#include <stdlib.h>
 #include <ncurses.h>
 #include <ctype.h>
 #include "KeyThread.h"
-#include "Socket.h"
+#include "SendThread.h"
 #include "Mutex.h"
 
 static u8 _LocBuf[MAXDATASIZE];
-static int menu_order = 0;
 
-int getItemNum()
+static int menu_order = -1;
+int getMenuOrder()
 {
 	return menu_order;
 }
 
 extern u8 getItemLen();
 
+static G_signal key_sign = SIGN_NO;
+G_signal getKeySign()
+{
+	return key_sign;
+}
+
 static Mutex* pLocMux = new Mutex();
 
-//extern void setLinkState(L_state s);
+static G_mode game_mode = MODE_UNKNOW;
+G_mode getGameMode()
+{
+	return game_mode;
+}
 
 bool readLocData(u8* buf, u32 len, u32 offset = 0)
 {
@@ -44,44 +55,95 @@ static bool writeLocData(u8* buf, u32 len, u32 offset = 0)
 	return true;
 }
 
+bool KeyThread::init()
+{
+	system(STTY_US TTY_PATH);
+	game_state = getGameState();
+	return true;
+}
 
+int KeyThread::get_char()
+{
+    fd_set rfds;
+    struct timeval tv;
+    int ch = 0;
+
+    FD_ZERO(&rfds);
+    FD_SET(0, &rfds);
+    tv.tv_sec = 0;
+    tv.tv_usec = 10; //设置等待超时时间
+
+    //检测键盘是否有输入
+    if (select(1, &rfds, NULL, NULL, &tv) > 0){
+        ch = getch(); 
+    }
+    return ch;
+}
 
 void KeyThread::run()
 {
+	init();
 	static int iX_local = COLS/2, iY_local = LINES/2;
 	int iX_local_org = COLS/2, iY_local_org = LINES/2;
-	int key_value;
 	int sum_item = getItemLen();
-	G_state game_state = getGameState();
-	mvprintw(0, (COLS-strlen("---------------------1--------------------"))/2, "---------------------1--------------------");
-	while(1)
+
+	while(GAME_EXIT != game_state)
 	{
-		key_value = getch();
-		mvprintw(0, (COLS-strlen("---------------------2--------------------"))/2, "---------------------2--------------------");
-		mvprintw(1, (COLS-strlen("key_value = 1"))/2, "key_value = %d", key_value);
+		key_value = get_char();
+		if(key_value == 3)
+		{
+			key_sign = SIGN_EXIT;
+			setAdvance();
+            //system(STTY_DEF TTY_PATH);
+            break;
+        }
 		switch(game_state)
 		{
 			case GAME_MAINMENU:
 			{
+				//mvprintw(1, (COLS-strlen("key value is 12"))/2, "key value is %2d", key_value);
 				switch (key_value)
 				{
 					case KEY_DOWN:
 					{
-						menu_order++;
-						menu_order = menu_order % sum_item;
-						
+						if(menu_order + 1 < sum_item)
+							menu_order++;
 						break;
 					}
 					case KEY_UP:
 					{
-						menu_order--;
-						menu_order = menu_order % sum_item;
+						if(menu_order - 1 >= 0)
+							menu_order--;
+						break;
+					}
+					case EV_ENTER:
+					{
+						switch(menu_order)
+						{
+							case 0:
+							{
+								game_mode = MODE_CREATE;
+								break;
+							}
+							case 1:
+							{
+								game_mode = MODE_JOIN;
+								break;
+							}
+							case 2:
+							{
+								key_sign = SIGN_EXIT;
+								break;
+							}
+							default:
+								break;
+						}
+						setAdvance();
 					}
 					default:
 						break;
 				}
-				
-				mvprintw(2, (COLS-strlen("menu_order = 1"))/2, "menu_order = %d", menu_order);
+				//mvprintw(2, (COLS-strlen("menu order is 12"))/2, "menu order is %2d", menu_order);
 				break;
 			}
 				
@@ -107,19 +169,20 @@ void KeyThread::run()
 				/*if _LocBuf changed*/
 				if(iY_local_org != iY_local || iX_local_org != iX_local)
 				{
-					sprintf((char*)_LocBuf, "%03d%03d", iX_local, iY_local);
+					sprintf((char*)_LocBuf, "a%03d%03d", iX_local, iY_local);
 					iX_local_org = iX_local;
 					iY_local_org = iY_local;
 				}
 				
-				writeLocData((u8*)_LocBuf, 6);
-				//writeData((u8*)_LocBuf, 6);
+				//writeLocData((u8*)_LocBuf, 6);
+				writeData((u8*)_LocBuf, 6);
+				
 				
 				break;
 			}
 			default:
 				break;
 		}
-		sleep(50);
+		msleep(50);
 	}
 }

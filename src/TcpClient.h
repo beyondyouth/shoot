@@ -17,6 +17,7 @@ public:
 	bool init(void);
 	bool conn(const char* servIp, u16 servPort);
 	bool disConn(void);
+	bool closeConn(void);
 private:
 	bool _bConnected;
 };

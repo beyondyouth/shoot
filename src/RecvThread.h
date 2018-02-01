@@ -8,13 +8,12 @@ class RecvThread : public Thread
 {
 public:
 	RecvThread();
-	bool init(Socket* pSock);
 	
 protected:
 	virtual void run();
 	
 private:
-	Socket* _Sock;
+	Socket* _pSock;
 	u32 _buflen;
 };
 

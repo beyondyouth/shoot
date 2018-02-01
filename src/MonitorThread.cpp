@@ -41,6 +41,11 @@ void MonitorThread::run()
 	setAdvance();
 	while(GAME_EXIT != game_state)
 	{
+		if(SIGN_EXIT == getKeySign() && true == advance_state)
+		{
+			advance_state = false;
+			game_state = GAME_EXIT;
+		}
 		if(GAME_START == game_state && true == advance_state)
 		{
 			game_state = GAME_MAINMENU;
@@ -71,7 +76,7 @@ void MonitorThread::run()
 			/*tcp线程启动*/
 			pInsUnicast = new UnicastThread();
 			pInsUnicast->start();
-		}
+		}	
 		if(GAME_LINKING == game_state && true == advance_state)
 		{
 			game_state = GAME_READY;
@@ -82,12 +87,13 @@ void MonitorThread::run()
 			/*接收线程启动*/
 			pInsRecv = new RecvThread();
 			pInsRecv->start();
-		}
+		}		
 		if(GAME_READY == game_state && true == advance_state)
 		{
 			game_state = GAME_FIGHT;
 			advance_state = false;
 		}
+#if 0		
 		if(GAME_FIGHT == game_state && true == advance_state)
 		{
 			game_state = GAME_OVER;
@@ -106,7 +112,9 @@ void MonitorThread::run()
 			game_state = GAME_EXIT;
 			advance_state = false;
 		}
+#endif
 		msleep(50);
+		mvprintw(0, (COLS-strlen("game state is 12"))/2, "game state is %2d", game_state);
 	}
 	if(NULL != pInsShow)
 		delete pInsShow;

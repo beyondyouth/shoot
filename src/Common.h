@@ -27,15 +27,24 @@ enum G_state
 	GAME_EXIT
 };
 
-enum Mode
+enum G_mode
 {
 	MODE_UNKNOW,
 	MODE_CREATE,
 	MODE_JOIN
 };
 
+enum G_signal
+{
+	SIGN_NO,
+	SIGN_PAUSE,
+	SIGN_EXIT
+};
+
 L_state getLinkState();
 G_state getGameState();
-Mode getGameMode();
+G_mode getGameMode();
+G_signal getKeySign();
+void setAdvance();
 
 #endif/*COMMON_H__*/
