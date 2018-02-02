@@ -2,14 +2,39 @@
 #include "Mutex.h"
 #include "ShowThread.h"
 
-static u8 _sendActBuf[MAXDATASIZE] = {0};
-static u8 _sendCmdBuf[MAXDATASIZE] = {0};
-
-static Mutex* pActMux = new Mutex();
-static Mutex* pCmdMux = new Mutex();
+static u8 _sendBuf[MAXDATASIZE] = {0};
+static Mutex* pSendMux = new Mutex();
 
 extern Socket* pTcpSock;
-extern void setLinkState(L_state s);
+
+bool writeSendBuf(u8* buf, u32 len, u32 offset)
+{
+	pSendMux->lock();
+	if(offset + len > MAXDATASIZE)
+	{
+		pSendMux->unlock();
+		return false;
+	}
+	
+	memcpy(_sendBuf + offset, buf, len);
+	pSendMux->unlock();
+	return true;
+}
+
+
+bool readSendBuf(u8* buf, u32 len, u32 offset)
+{
+	pSendMux->lock();
+	if(offset + len > MAXDATASIZE)
+	{
+		pSendMux->unlock();
+		return false;
+	}
+	
+	memcpy(buf, _sendBuf + offset, len);
+	pSendMux->unlock();
+	return true;
+}
 
 SendThread::SendThread()
 {
@@ -19,81 +44,19 @@ SendThread::SendThread()
 
 void SendThread::run()
 {
-	while(GAME_OVER != getGameState())
-	{	
-		if(0 != _sendCmdBuf[0])
+	u8 tempBuf[MAXDATASIZE] = {0};
+	while(GAME_EXIT != getGameState())
+	{
+		if(0 != _sendBuf[0])
 		{
-			if(false == _pSock->writeData(_sendCmdBuf, _buflen))
+			readSendBuf(tempBuf, MAXDATASIZE);
+			if(false == _pSock->writeData(tempBuf, _buflen))
 			{
 				printf("error:%s %d",__FILE__, __LINE__);
 			}
-			bzero(_sendCmdBuf, MAXDATASIZE);
-		}
-		if(0 != _sendActBuf[0])
-		{
-			if(false == _pSock->writeData(_sendActBuf, _buflen))
-			{
-				printf("error:%s %d",__FILE__, __LINE__);
-			}
-			bzero(_sendActBuf, MAXDATASIZE);
+			bzero(tempBuf, MAXDATASIZE);
 		}
 		msleep(50);
 	}
 }
 
-bool writeSendAct(u8* buf, u32 len, u32 offset = 0)
-{
-	pActMux->lock();
-	if(offset + len > MAXDATASIZE)
-	{
-		pActMux->unlock();
-		return false;
-	}
-	
-	memcpy(_sendActBuf + offset, buf, len);
-	pActMux->unlock();
-	return true;
-}
-
-bool writeSendCmd(u8* buf, u32 len, u32 offset = 0)
-{
-	pCmdMux->lock();
-	if(offset + len > MAXDATASIZE)
-	{
-		pCmdMux->unlock();
-		return false;
-	}
-	
-	memcpy(_sendCmdBuf + offset, buf, len);
-	pCmdMux->unlock();
-	return true;	
-
-}
-
-bool readSendAct(u8* buf, u32 len, u32 offset = 0)
-{
-	pActMux->lock();
-	if(offset + len > MAXDATASIZE)
-	{
-		pActMux->unlock();
-		return false;
-	}
-	
-	memcpy(buf, _sendActBuf + offset, len);
-	pActMux->unlock();
-	return true;
-}
-
-bool readSendCmd(u8* buf, u32 len, u32 offset = 0)
-{
-	pCmdMux->lock();
-	if(offset + len > MAXDATASIZE)
-	{
-		pCmdMux->unlock();
-		return false;
-	}
-	
-	memcpy(buf, _sendCmdBuf + offset, len);
-	pCmdMux->unlock();
-	return true;
-}

@@ -1,11 +1,9 @@
 #include <stdlib.h>
 #include "ShowThread.h"
 #include "ShootThread.h"
-#include "SendThread.h"
+#include "KeyThread.h"
 #include "RecvThread.h"
 
-extern bool readRecvCmd(u8* buf, u32 len, u32 offset = 0);
-extern bool readRecvAct(u8* buf, u32 len, u32 offset = 0);
 extern int getMenuOrder();
 
 int iX_remote = COLS/2, iY_remote = LINES/2;
@@ -117,11 +115,11 @@ void ShowThread::run()
 			case GAME_FIGHT:
 			{
 				fight();
-				if(false == readRecvAct((u8*)sX_remote, 3, 0))
+				if(false == readRecvBuf((u8*)sX_remote, 3, 0))
 					break;
-				if(false == readRecvAct((u8*)sY_remote, 3, 3))
+				if(false == readRecvBuf((u8*)sY_remote, 3, 3))
 					break;
-				mvprintw(1, 80, "X:%s Y:%s", sX_remote, sY_remote);
+				mvprintw(1, 100, "X:%s Y:%s", sX_remote, sY_remote);
 				iX_remote = atoi(sX_remote);
 				iY_remote = atoi(sY_remote);
 				if(iY_remote_org != iY_remote || iX_remote_org != iX_remote)
@@ -132,8 +130,8 @@ void ShowThread::run()
 					iY_remote_org = iY_remote;
 				}
 				
-				readLocData((u8*)sX_local, 3, 1);
-				readLocData((u8*)sY_local, 3, 4);
+				readLocalBuf((u8*)sX_local, 3, 0);
+				readLocalBuf((u8*)sY_local, 3, 3);
 				mvprintw(1, 10, "X:%s Y:%s", sX_local, sY_local);
 				iX_local = atoi(sX_local);
 				iY_local = atoi(sY_local);

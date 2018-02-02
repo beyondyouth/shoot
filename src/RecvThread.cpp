@@ -1,66 +1,36 @@
 #include "RecvThread.h"
 #include "Mutex.h"
-
 #include "ShowThread.h"
 
-static u8 _recvActBuf[MAXDATASIZE];
-static u8 _recvCmdBuf[MAXDATASIZE];
-
-static Mutex* pActMux = new Mutex();
-static Mutex* pCmdMux = new Mutex();
+static u8 _recvBuf[MAXDATASIZE] = {0};
+static Mutex* pRecvMux = new Mutex();
 
 extern Socket* pTcpSock;
 //extern void setLinkState(L_state s);
 
-bool readRecvAct(u8* buf, u32 len, u32 offset = 0)
+bool readRecvBuf(u8* buf, u32 len, u32 offset)
 {
-	pActMux->lock();
+	pRecvMux->lock();
 	if(offset + len > MAXDATASIZE)
 	{
-		pActMux->unlock();
+		pRecvMux->unlock();
 		return false;
 	}
-	memcpy(buf, _recvActBuf + offset, len);
-	pActMux->unlock();
+	memcpy(buf, _recvBuf + offset, len);
+	pRecvMux->unlock();
 	return true;
 }
 
-bool readRecvCmd(u8* buf, u32 len, u32 offset = 0)
+bool writeRecvBuf(u8* buf, u32 len, u32 offset)
 {
-	pCmdMux->lock();
+	pRecvMux->lock();
 	if(offset + len > MAXDATASIZE)
 	{
-		pCmdMux->unlock();
+		pRecvMux->unlock();
 		return false;
 	}
-	memcpy(buf, _recvCmdBuf + offset, len);
-	pCmdMux->unlock();
-	return true;
-}
-
-static bool writeRecvAct(u8* buf, u32 len, u32 offset = 0)
-{
-	pActMux->lock();
-	if(offset + len > MAXDATASIZE)
-	{
-		pActMux->unlock();
-		return false;
-	}
-	memcpy(_recvActBuf + offset, buf, len);
-	pActMux->unlock();
-	return true;
-}
-
-static bool writeRecvCmd(u8* buf, u32 len, u32 offset = 0)
-{
-	pCmdMux->lock();
-	if(offset + len > MAXDATASIZE)
-	{
-		pCmdMux->unlock();
-		return false;
-	}
-	memcpy(_recvCmdBuf + offset, buf, len);
-	pCmdMux->unlock();
+	memcpy(_recvBuf + offset, buf, len);
+	pRecvMux->unlock();
 	return true;
 }
 
@@ -72,31 +42,19 @@ RecvThread::RecvThread()
 
 void RecvThread::run()
 {
-	u8 tempbuf[MAXDATASIZE];
-	bzero(tempbuf, MAXDATASIZE);
-	while(GAME_OVER != getGameState())
+	u8 tempBuf[MAXDATASIZE] = {0};
+	while(GAME_EXIT != getGameState())
 	{
-		if(false == _pSock->readData(tempbuf, _buflen))
+		if(false == _pSock->readData(tempBuf, _buflen))
 		{
 			printf("error:%s %d",__FILE__, __LINE__);
 //			setLinkState(LINK_ABORT);
 		}
-		switch(tempbuf[0])
+		if(0 != tempBuf[0])
 		{
-			case 'a':
-			{
-				writeRecvAct(tempbuf + 1, MAXDATASIZE - 1);
-				bzero(tempbuf, MAXDATASIZE);
-				break;
-			}
-			case 'c':
-			{
-				writeRecvCmd(tempbuf + 1, MAXDATASIZE - 1);
-				bzero(tempbuf, MAXDATASIZE);
-				break;
-			}
+			writeRecvBuf(tempBuf, MAXDATASIZE);
+			bzero(tempBuf, MAXDATASIZE);
 		}
-		
 		msleep(50);
 	}
 }

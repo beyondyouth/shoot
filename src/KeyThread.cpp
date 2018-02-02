@@ -5,8 +5,35 @@
 #include "SendThread.h"
 #include "Mutex.h"
 
-static u8 _LocBuf[MAXDATASIZE] = {0};
-extern void writeSendAct(u8* buf, u32 len, u32 offset = 0);
+static u8 _localBuf[MAXDATASIZE] = {0};
+static Mutex* pLocalMux = new Mutex();
+
+bool readLocalBuf(u8* buf, u32 len, u32 offset)
+{
+	pLocalMux->lock();
+	if(offset + len > MAXDATASIZE)
+	{
+		pLocalMux->unlock();
+		return false;
+	}
+	memcpy(buf, _localBuf + offset, len);
+	pLocalMux->unlock();
+	return true;
+}
+
+bool writeLocalBuf(u8* buf, u32 len, u32 offset)
+{
+	pLocalMux->lock();
+	if(offset + len > MAXDATASIZE)
+	{
+		pLocalMux->unlock();
+		return false;
+	}
+	memcpy(_localBuf + offset, buf, len);
+	pLocalMux->unlock();
+	return true;
+}
+
 static int menu_order = -1;
 int getMenuOrder()
 {
@@ -21,40 +48,12 @@ G_signal getKeySign()
 	return key_sign;
 }
 
-static Mutex* pLocMux = new Mutex();
-
 static G_mode game_mode = MODE_UNKNOW;
 G_mode getGameMode()
 {
 	return game_mode;
 }
 
-bool readLocData(u8* buf, u32 len, u32 offset = 0)
-{
-	pLocMux->lock();
-	if(offset + len > MAXDATASIZE)
-	{
-		pLocMux->unlock();
-		return false;
-	}
-	memcpy(buf, _LocBuf + offset, len);
-	pLocMux->unlock();
-	return true;
-}
-/*
-static bool writeLocData(u8* buf, u32 len, u32 offset = 0)
-{
-	pLocMux->lock();
-	if(offset + len > MAXDATASIZE)
-	{
-		pLocMux->unlock();
-		return false;
-	}
-	memcpy(_LocBuf + offset, buf, len);
-	pLocMux->unlock();
-	return true;
-}
-*/
 bool KeyThread::init()
 {
 	system(STTY_US TTY_PATH);
@@ -163,11 +162,11 @@ void KeyThread::run()
 						break;
 				}
 				/*if _LocBuf changed*/
-				pLocMux->lock();
-				sprintf((char*)_LocBuf, "a%03d%03d", iX_local, iY_local);
-				pLocMux->unlock();
+				pLocalMux->lock();
+				sprintf((char*)_localBuf, "%03d%03d", iX_local, iY_local);
+				pLocalMux->unlock();
 
-				writeSendAct((u8*)_LocBuf, 7);			
+				writeSendBuf((u8*)_localBuf, 6);			
 				break;
 			}
 			default:

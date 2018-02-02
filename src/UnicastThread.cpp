@@ -28,11 +28,11 @@ void UnicastThread::run()
 		{
 			TcpServer* pInsTcp = new TcpServer();
 			pTcpSock = (Socket*)pInsTcp;
-			pInsTcp->init("10.10.98.239", 8817);
+			pInsTcp->init("127.0.0.1", 8817);
 			link_state = LINK_ACCEPT;
 			pInsTcp->acceptConn();
 			link_state = LINK_SUCCESS;
-			while(GAME_OVER != getGameState())
+			while(GAME_EXIT != getGameState())
 			{
 				msleep(50);
 			}
@@ -47,12 +47,12 @@ void UnicastThread::run()
 			pTcpSock = (Socket*)pInsTcp;
 			pInsTcp->init();
 			link_state = LINK_CONNECT;
-			while(false == pInsTcp->conn("10.10.98.239", 8817))
+			while(false == pInsTcp->conn("127.0.0.1", 8817))
 			{
 				sleep(3);
 			}
 			link_state = LINK_SUCCESS;
-			while(GAME_OVER != getGameState())
+			while(GAME_EXIT != getGameState())
 			{
 				msleep(50);
 			}
