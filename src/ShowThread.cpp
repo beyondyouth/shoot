@@ -7,10 +7,12 @@
 extern int getMenuOrder();
 
 int iX_remote = COLS/2, iY_remote = LINES/2;
-char sX_remote[4] = {0}, sY_remote[4] = {0};
+char sX_remote[4] = {0};
+char sY_remote[4] = {0};
 
 int iX_local = COLS/2, iY_local = COLS/2;
-char sX_local[4] = {0}, sY_local[4] = {0};
+char sX_local[4] = {0};
+char sY_local[4] = {0};
 
 
 static char* item[] = 
@@ -21,8 +23,6 @@ static char* item[] =
 };
 
 static int sum_item = sizeof(item)/sizeof(item[0]);
-
-extern bool readLocData(u8* buf, u32 len, u32 offset = 0);
 
 u8 getItemLen()
 {
@@ -35,8 +35,6 @@ bool ShowThread::init()
 	cbreak();/*行缓冲禁止，传递所有控制信息*/
 	keypad(stdscr, TRUE);/*程序需要使用F1功能键*/
 	curs_set(0);/*隐藏光标*/
-	bzero(localData, 6);
-	bzero(remoteData, 6);
 	childWin = NULL;
 	return true;
 }
@@ -90,8 +88,8 @@ void ShowThread::exit()
 
 void ShowThread::run()
 {
-	static int iX_remote_org = COLS/2, iY_remote_org = LINES/2;
-	static int iX_local_org = COLS/2, iY_local_org = LINES/2;
+//	static int iX_remote_org = COLS/2, iY_remote_org = LINES/2;
+//	static int iX_local_org = COLS/2, iY_local_org = LINES/2;
 	init();
 	while(GAME_EXIT != getGameState())
 	{
@@ -119,30 +117,18 @@ void ShowThread::run()
 					break;
 				if(false == readRecvBuf((u8*)sY_remote, 3, 3))
 					break;
-				mvprintw(1, 100, "X:%s Y:%s", sX_remote, sY_remote);
+				mvprintw(1, COLS-21, "X:%s Y:%s", sX_remote, sY_remote);
 				iX_remote = atoi(sX_remote);
 				iY_remote = atoi(sY_remote);
-				if(iY_remote_org != iY_remote || iX_remote_org != iX_remote)
-				{
-					//mvwprintw(childWin, iY_remote_org, iX_remote_org, " ");
-					mvwprintw(childWin, iY_remote, iX_remote, "r");
-					iX_remote_org = iX_remote;
-					iY_remote_org = iY_remote;
-				}
+				mvwprintw(childWin, iY_remote, iX_remote, "r");
 				
 				readLocalBuf((u8*)sX_local, 3, 0);
 				readLocalBuf((u8*)sY_local, 3, 3);
 				mvprintw(1, 10, "X:%s Y:%s", sX_local, sY_local);
 				iX_local = atoi(sX_local);
 				iY_local = atoi(sY_local);
-				if(iY_local_org != iY_local || iX_local_org != iX_local)
-				{
-//					mvprintw((LINES - sum_item)/2 + j, (COLS-strlen(item[j]))/2, "%s", item[j]);
-					//mvwprintw(childWin, iY_remote_org, iX_remote_org, " ");
-					mvwprintw(childWin, iY_local, iX_local, "l");
-					iX_local_org = iX_local;
-					iY_local_org = iY_local;
-				}
+				mvwprintw(childWin, iY_local, iX_local, "l");
+
 				wrefresh(childWin);
 				break;
 			}

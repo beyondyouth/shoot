@@ -8,6 +8,10 @@ int main()
 	MonitorThread InsMonitor;
 	InsMonitor.start();
 	InsMonitor.wait();
+//	char data[6] = "abcde";
+//	char test[3] = {0};
+//	memcpy(test, data, 3);
+//	printf("test is %s\n", test);
 	return 0;
 }
 

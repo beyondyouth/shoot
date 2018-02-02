@@ -24,8 +24,6 @@ protected:
 	bool respond(WINDOW* local_win);
 	
 private:
-	u8 localData[6];
-	u8 remoteData[6];
 	WINDOW* childWin;
 };
 
