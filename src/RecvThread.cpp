@@ -12,7 +12,7 @@ static Mutex* pCmdMux = new Mutex();
 extern Socket* pTcpSock;
 //extern void setLinkState(L_state s);
 
-bool readActData(u8* buf, u32 len, u32 offset = 0)
+bool readRecvAct(u8* buf, u32 len, u32 offset = 0)
 {
 	pActMux->lock();
 	if(offset + len > MAXDATASIZE)
@@ -25,7 +25,7 @@ bool readActData(u8* buf, u32 len, u32 offset = 0)
 	return true;
 }
 
-bool readCmdData(u8* buf, u32 len, u32 offset = 0)
+bool readRecvCmd(u8* buf, u32 len, u32 offset = 0)
 {
 	pCmdMux->lock();
 	if(offset + len > MAXDATASIZE)
@@ -38,7 +38,7 @@ bool readCmdData(u8* buf, u32 len, u32 offset = 0)
 	return true;
 }
 
-static bool writeActData(u8* buf, u32 len, u32 offset = 0)
+static bool writeRecvAct(u8* buf, u32 len, u32 offset = 0)
 {
 	pActMux->lock();
 	if(offset + len > MAXDATASIZE)
@@ -51,7 +51,7 @@ static bool writeActData(u8* buf, u32 len, u32 offset = 0)
 	return true;
 }
 
-static bool writeCmdData(u8* buf, u32 len, u32 offset = 0)
+static bool writeRecvCmd(u8* buf, u32 len, u32 offset = 0)
 {
 	pCmdMux->lock();
 	if(offset + len > MAXDATASIZE)
@@ -68,7 +68,6 @@ RecvThread::RecvThread()
 {
 	_pSock = pTcpSock;
 	_buflen = MAXDATASIZE;
-	setAdvance();
 }
 
 void RecvThread::run()
@@ -86,13 +85,13 @@ void RecvThread::run()
 		{
 			case 'a':
 			{
-				writeActData(tempbuf + 1, MAXDATASIZE - 1);
+				writeRecvAct(tempbuf + 1, MAXDATASIZE - 1);
 				bzero(tempbuf, MAXDATASIZE);
 				break;
 			}
 			case 'c':
 			{
-				writeCmdData(tempbuf + 1, MAXDATASIZE - 1);
+				writeRecvCmd(tempbuf + 1, MAXDATASIZE - 1);
 				bzero(tempbuf, MAXDATASIZE);
 				break;
 			}

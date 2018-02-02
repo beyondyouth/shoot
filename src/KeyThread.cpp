@@ -5,8 +5,8 @@
 #include "SendThread.h"
 #include "Mutex.h"
 
-static u8 _LocBuf[MAXDATASIZE];
-
+static u8 _LocBuf[MAXDATASIZE] = {0};
+extern void writeSendAct(u8* buf, u32 len, u32 offset = 0);
 static int menu_order = -1;
 int getMenuOrder()
 {
@@ -41,7 +41,7 @@ bool readLocData(u8* buf, u32 len, u32 offset = 0)
 	pLocMux->unlock();
 	return true;
 }
-
+/*
 static bool writeLocData(u8* buf, u32 len, u32 offset = 0)
 {
 	pLocMux->lock();
@@ -54,7 +54,7 @@ static bool writeLocData(u8* buf, u32 len, u32 offset = 0)
 	pLocMux->unlock();
 	return true;
 }
-
+*/
 bool KeyThread::init()
 {
 	system(STTY_US TTY_PATH);
@@ -83,7 +83,6 @@ void KeyThread::run()
 {
 	init();
 	static int iX_local = COLS/2, iY_local = LINES/2;
-	int iX_local_org = COLS/2, iY_local_org = LINES/2;
 	int sum_item = getItemLen();
 
 	while(GAME_EXIT != getGameState())
@@ -92,7 +91,6 @@ void KeyThread::run()
 		if(key_value == 3)
 		{
 			key_sign = SIGN_EXIT;
-			setAdvance();
             //system(STTY_DEF TTY_PATH);
             break;
         }
@@ -137,7 +135,6 @@ void KeyThread::run()
 							default:
 								break;
 						}
-						setAdvance();
 					}
 					default:
 						break;
@@ -166,17 +163,11 @@ void KeyThread::run()
 						break;
 				}
 				/*if _LocBuf changed*/
-				if(iY_local_org != iY_local || iX_local_org != iX_local)
-				{
-					sprintf((char*)_LocBuf, "a%03d%03d", iX_local, iY_local);
-					iX_local_org = iX_local;
-					iY_local_org = iY_local;
-				}
-				mvprintw(1, 120, "locbuf:%s", _LocBuf);
-				//writeLocData((u8*)_LocBuf, 6);
-				writeData((u8*)_LocBuf, 7);
-				
-				
+				pLocMux->lock();
+				sprintf((char*)_LocBuf, "a%03d%03d", iX_local, iY_local);
+				pLocMux->unlock();
+
+				writeSendAct((u8*)_LocBuf, 7);			
 				break;
 			}
 			default:

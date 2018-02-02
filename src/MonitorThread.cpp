@@ -6,8 +6,6 @@
 #include "SendThread.h"
 #include "RecvThread.h"
 
-bool advance_state = false;
-
 static G_state game_state = GAME_EXIT;
 
 
@@ -24,11 +22,6 @@ MonitorThread::~MonitorThread()
 {
 }
 
-void setAdvance()
-{
-	advance_state = true;
-}
-
 void MonitorThread::run()
 {
 	game_state = GAME_START;
@@ -38,18 +31,15 @@ void MonitorThread::run()
 	UnicastThread* pInsUnicast = NULL;
 	SendThread* pInsSend = NULL;
 	RecvThread* pInsRecv = NULL;
-	setAdvance();
 	while(GAME_EXIT != game_state)
 	{
-		if(SIGN_EXIT == getKeySign() && true == advance_state)
+		if(SIGN_EXIT == getKeySign())
 		{
-			advance_state = false;
 			game_state = GAME_EXIT;
 		}
-		if(GAME_START == game_state && true == advance_state)
+		if(GAME_START == game_state)
 		{
 			game_state = GAME_MAINMENU;
-			advance_state = false;
 			/*更新界面线程启动*/
 			pInsShow = new ShowThread();
 			pInsShow->start();
@@ -59,28 +49,25 @@ void MonitorThread::run()
 		}
 		
 #if 0
-		if(GAME_MAINMENU == game_state && true == advance_state)
+		if(GAME_MAINMENU == game_state)
 		{
 			game_state = GAME_SCANING;
-			advance_state = false;
 			/*扫描线程启动*/
 			pInsScan = new ScanThread();
 			pInsScan->start();
 		}
 		
 #endif
-		if(GAME_MAINMENU == game_state && true == advance_state)
+		if(GAME_MAINMENU == game_state && MODE_UNKNOW != getGameMode())
 		{
 			game_state = GAME_LINKING;
-			advance_state = false;
 			/*tcp线程启动*/
 			pInsUnicast = new UnicastThread();
 			pInsUnicast->start();
 		}	
-		if(GAME_LINKING == game_state && true == advance_state)
+		if(GAME_LINKING == game_state && LINK_SUCCESS == getLinkState())
 		{
 			game_state = GAME_READY;
-			advance_state = false;
 			/*发送线程启动*/
 			pInsSend = new SendThread();
 			pInsSend->start();
@@ -88,10 +75,9 @@ void MonitorThread::run()
 			pInsRecv = new RecvThread();
 			pInsRecv->start();
 		}		
-		if(GAME_READY == game_state && true == advance_state)
+		if(GAME_READY == game_state)
 		{
 			game_state = GAME_FIGHT;
-			advance_state = false;
 		}
 #if 0		
 		if(GAME_FIGHT == game_state && true == advance_state)
@@ -116,6 +102,15 @@ void MonitorThread::run()
 		msleep(50);
 		mvprintw(0, (COLS-strlen("game state is 12"))/2, "game state is %2d", game_state);
 	}
+	
+	if(NULL != pInsSend)
+		delete pInsSend;
+	if(NULL != pInsRecv)
+		delete pInsRecv;
+	if(NULL != pInsUnicast)
+		delete pInsUnicast;
+	
+	
 	if(NULL != pInsShow)
 		delete pInsShow;
 	if(NULL != pInsKey)

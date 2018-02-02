@@ -4,15 +4,15 @@
 #include "SendThread.h"
 #include "RecvThread.h"
 
-extern bool readCmdData(u8* buf, u32 len, u32 offset = 0);
-extern bool readActData(u8* buf, u32 len, u32 offset = 0);
+extern bool readRecvCmd(u8* buf, u32 len, u32 offset = 0);
+extern bool readRecvAct(u8* buf, u32 len, u32 offset = 0);
 extern int getMenuOrder();
 
 int iX_remote = COLS/2, iY_remote = LINES/2;
-char sX_remote[3] = {0}, sY_remote[3] = {0};
+char sX_remote[4] = {0}, sY_remote[4] = {0};
 
 int iX_local = COLS/2, iY_local = COLS/2;
-char sX_local[3] = {0}, sY_local[3] = {0};
+char sX_local[4] = {0}, sY_local[4] = {0};
 
 
 static char* item[] = 
@@ -92,7 +92,8 @@ void ShowThread::exit()
 
 void ShowThread::run()
 {
-	int iX_remote_org = COLS/2, iY_remote_org = LINES/2;
+	static int iX_remote_org = COLS/2, iY_remote_org = LINES/2;
+	static int iX_local_org = COLS/2, iY_local_org = LINES/2;
 	init();
 	while(GAME_EXIT != getGameState())
 	{
@@ -116,9 +117,9 @@ void ShowThread::run()
 			case GAME_FIGHT:
 			{
 				fight();
-				if(false == readActData((u8*)sX_remote, 3, 0))
+				if(false == readRecvAct((u8*)sX_remote, 3, 0))
 					break;
-				if(false == readActData((u8*)sY_remote, 3, 3))
+				if(false == readRecvAct((u8*)sY_remote, 3, 3))
 					break;
 				mvprintw(1, 80, "X:%s Y:%s", sX_remote, sY_remote);
 				iX_remote = atoi(sX_remote);
@@ -127,7 +128,6 @@ void ShowThread::run()
 				{
 					//mvwprintw(childWin, iY_remote_org, iX_remote_org, " ");
 					mvwprintw(childWin, iY_remote, iX_remote, "r");
-					
 					iX_remote_org = iX_remote;
 					iY_remote_org = iY_remote;
 				}
@@ -135,6 +135,16 @@ void ShowThread::run()
 				readLocData((u8*)sX_local, 3, 1);
 				readLocData((u8*)sY_local, 3, 4);
 				mvprintw(1, 10, "X:%s Y:%s", sX_local, sY_local);
+				iX_local = atoi(sX_local);
+				iY_local = atoi(sY_local);
+				if(iY_local_org != iY_local || iX_local_org != iX_local)
+				{
+//					mvprintw((LINES - sum_item)/2 + j, (COLS-strlen(item[j]))/2, "%s", item[j]);
+					//mvwprintw(childWin, iY_remote_org, iX_remote_org, " ");
+					mvwprintw(childWin, iY_local, iX_local, "l");
+					iX_local_org = iX_local;
+					iY_local_org = iY_local;
+				}
 				wrefresh(childWin);
 				break;
 			}

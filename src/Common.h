@@ -45,6 +45,5 @@ L_state getLinkState();
 G_state getGameState();
 G_mode getGameMode();
 G_signal getKeySign();
-void setAdvance();
 
 #endif/*COMMON_H__*/

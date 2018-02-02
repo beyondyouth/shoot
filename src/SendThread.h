@@ -14,6 +14,7 @@ protected:
 	
 private:
 	Socket* _pSock;
+	u32 _buflen;
 };
 
 void writeData(u8* buf, u32 len);

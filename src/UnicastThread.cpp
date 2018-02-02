@@ -2,6 +2,12 @@
 #include "TcpClient.h"
 #include "TcpServer.h"
 
+static L_state link_state = LINK_FAILED;
+L_state getLinkState()
+{
+	return link_state;
+}
+
 Socket* pTcpSock = NULL;
 
 UnicastThread::UnicastThread()
@@ -22,9 +28,10 @@ void UnicastThread::run()
 		{
 			TcpServer* pInsTcp = new TcpServer();
 			pTcpSock = (Socket*)pInsTcp;
-			pInsTcp->init("10.0.2.15", 8817);
+			pInsTcp->init("10.10.98.239", 8817);
+			link_state = LINK_ACCEPT;
 			pInsTcp->acceptConn();
-			setAdvance();
+			link_state = LINK_SUCCESS;
 			while(GAME_OVER != getGameState())
 			{
 				msleep(50);
@@ -39,11 +46,12 @@ void UnicastThread::run()
 			TcpClient* pInsTcp = new TcpClient();
 			pTcpSock = (Socket*)pInsTcp;
 			pInsTcp->init();
-			while(false == pInsTcp->conn("10.0.2.15", 8817))
+			link_state = LINK_CONNECT;
+			while(false == pInsTcp->conn("10.10.98.239", 8817))
 			{
 				sleep(3);
 			}
-			setAdvance();
+			link_state = LINK_SUCCESS;
 			while(GAME_OVER != getGameState())
 			{
 				msleep(50);
