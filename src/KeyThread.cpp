@@ -5,6 +5,7 @@
 #include "SendThread.h"
 #include "Mutex.h"
 
+extern Node* head;
 static u8 _localBuf[MAXDATASIZE] = {0};
 static Mutex* pLocalMux = new Mutex();
 
@@ -34,24 +35,21 @@ bool writeLocalBuf(u8* buf, u32 len, u32 offset)
 	return true;
 }
 
-static int menu_order = -1;
-int getMenuOrder()
+static Node* pKeyNode = NULL;
+Node* getKeyNode()
 {
-	return menu_order;
+	return pKeyNode;
 }
 
-extern u8 getItemLen();
-
-static G_signal key_sign = SIGN_NO;
-G_signal getKeySign()
+static G_signal sign = SIGN_NO;
+G_signal getSignal()
 {
-	return key_sign;
+	return sign;
 }
 
-static G_mode game_mode = MODE_UNKNOW;
-G_mode getGameMode()
+void setSignal(G_signal S)
 {
-	return game_mode;
+	sign = S;
 }
 
 bool KeyThread::init()
@@ -72,8 +70,9 @@ int KeyThread::get_char()
     tv.tv_usec = 10; //设置等待超时时间
 
     //检测键盘是否有输入
-    if (select(1, &rfds, NULL, NULL, &tv) > 0){
-        ch = getch(); 
+    if (select(1, &rfds, NULL, NULL, &tv) > 0)
+	{
+        ch = getch();
     }
     return ch;
 }
@@ -82,58 +81,46 @@ void KeyThread::run()
 {
 	init();
 	static int iX_local = COLS/2, iY_local = LINES/2;
-	int sum_item = getItemLen();
 
 	while(GAME_EXIT != getGameState())
 	{
 		key_value = get_char();
 		if(key_value == 3)
 		{
-			key_sign = SIGN_EXIT;
+			setSignal(SIGN_EXIT);
             //system(STTY_DEF TTY_PATH);
             break;
         }
+		if(NULL == pKeyNode)
+			pKeyNode = head;
 		switch(getGameState())
 		{
-			case GAME_MAINMENU:
+			case GAME_SELECT:
 			{
 				//mvprintw(1, (COLS-strlen("key value is 12"))/2, "key value is %2d", key_value);
 				switch (key_value)
 				{
 					case KEY_DOWN:
 					{
-						if(menu_order + 1 < sum_item)
-							menu_order++;
+						if(NULL == pKeyNode)
+							break;
+						if(NULL == pKeyNode->next)
+							break;
+						pKeyNode = pKeyNode->next;
 						break;
 					}
 					case KEY_UP:
 					{
-						if(menu_order - 1 >= 0)
-							menu_order--;
+						if(NULL == pKeyNode)
+							break;
+						if(NULL == pKeyNode->prev)
+							break;
+						pKeyNode = pKeyNode->prev;
 						break;
 					}
 					case EV_ENTER:
 					{
-						switch(menu_order)
-						{
-							case 0:
-							{
-								game_mode = MODE_CREATE;
-								break;
-							}
-							case 1:
-							{
-								game_mode = MODE_JOIN;
-								break;
-							}
-							case 2:
-							{
-								key_sign = SIGN_EXIT;
-								break;
-							}
-							default:
-								break;
-						}
+						/*进入link阶段*/
 					}
 					default:
 						break;

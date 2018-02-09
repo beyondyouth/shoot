@@ -1,5 +1,5 @@
-#ifndef MAP_THREAD_H__
-#define MAP_THREAD_H__
+#ifndef SHOW_THREAD_H__
+#define SHOW_THREAD_H__
 
 #include <string.h>
 #include <ncurses.h>
@@ -27,4 +27,4 @@ private:
 	WINDOW* childWin;
 };
 
-#endif/*MAP_THREAD_H__*/
+#endif/*SHOW_THREAD_H__*/

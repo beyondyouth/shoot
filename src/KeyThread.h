@@ -24,4 +24,4 @@ private:
 bool readLocalBuf(u8* buf, u32 len, u32 offset = 0);
 bool writeLocalBuf(u8* buf, u32 len, u32 offset = 0);
 
-#endif
+#endif /*KEY_THREAD_H__*/

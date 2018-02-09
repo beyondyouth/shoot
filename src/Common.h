@@ -18,20 +18,11 @@ enum L_state
 enum G_state
 {
 	GAME_START,
-	GAME_MAINMENU,
-	GAME_SCANING,
-	GAME_LINKING,
-	GAME_READY,
+	GAME_SELECT,
+	GAME_LINK,
 	GAME_FIGHT,
 	GAME_OVER,
 	GAME_EXIT
-};
-
-enum G_mode
-{
-	MODE_UNKNOW,
-	MODE_CREATE,
-	MODE_JOIN
 };
 
 enum G_signal
@@ -41,9 +32,23 @@ enum G_signal
 	SIGN_EXIT
 };
 
+struct Node
+{
+	char data[15];
+	struct Node* prev;
+	struct Node* next;
+};
+typedef struct Node Node;
+
+void push(Node* n);
+void erase(Node* n);
+Node* find(char* d);
+void output(void);
+int getlen(void);
+
 L_state getLinkState();
 G_state getGameState();
-G_mode getGameMode();
-G_signal getKeySign();
+G_signal getSignal();
+void setSignal(G_signal S);
 
 #endif/*COMMON_H__*/

@@ -55,6 +55,10 @@ void RecvThread::run()
 			writeRecvBuf(tempBuf, MAXDATASIZE);
 			bzero(tempBuf, MAXDATASIZE);
 		}
+		else
+		{
+//			setSignal(SIGN_EXIT);
+		}
 		msleep(50);
 	}
 }

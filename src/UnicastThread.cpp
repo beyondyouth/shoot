@@ -20,7 +20,7 @@ UnicastThread::~UnicastThread()
 
 void UnicastThread::run()
 {
-	G_mode game_mode = getGameMode();
+/*	G_mode game_mode = getGameMode();
 	
 	switch(game_mode)
 	{
@@ -31,6 +31,7 @@ void UnicastThread::run()
 			pInsTcp->init("127.0.0.1", 8817);
 			link_state = LINK_ACCEPT;
 			pInsTcp->acceptConn();
+			pInsTcp->setSocketNonblock();
 			link_state = LINK_SUCCESS;
 			while(GAME_EXIT != getGameState())
 			{
@@ -51,6 +52,7 @@ void UnicastThread::run()
 			{
 				sleep(3);
 			}
+			pInsTcp->setSocketNonblock();
 			link_state = LINK_SUCCESS;
 			while(GAME_EXIT != getGameState())
 			{
@@ -64,7 +66,7 @@ void UnicastThread::run()
 		default:
 			break;
 	}
-	
+*/	
 //	Udp_Client InsUdp = new UdpClient();
 	
 }

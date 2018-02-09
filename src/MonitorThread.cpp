@@ -31,41 +31,34 @@ void MonitorThread::run()
 	UnicastThread* pInsUnicast = NULL;
 	SendThread* pInsSend = NULL;
 	RecvThread* pInsRecv = NULL;
-	while(GAME_EXIT != game_state)
+	while(game_state < GAME_EXIT)
 	{
-		if(SIGN_EXIT == getKeySign())
+		if(SIGN_EXIT == getSignal())
 		{
 			game_state = GAME_EXIT;
 		}
 		if(GAME_START == game_state)
 		{
-			game_state = GAME_MAINMENU;
+			game_state = GAME_SELECT;
 			/*更新界面线程启动*/
-			pInsShow = new ShowThread();
-			pInsShow->start();
+//			pInsShow = new ShowThread();
+//			pInsShow->start();
 			/*获取按键线程启动*/
 			pInsKey = new KeyThread();
 			pInsKey->start();
-		}
-		
-#if 0
-		if(GAME_MAINMENU == game_state)
-		{
-			game_state = GAME_SCANING;
 			/*扫描线程启动*/
 			pInsScan = new ScanThread();
 			pInsScan->start();
 		}
-		
-#endif
-		if(GAME_MAINMENU == game_state && MODE_UNKNOW != getGameMode())
+#if 0
+		if(GAME_SELECT == game_state && MODE_UNKNOW != getGameMode())
 		{
 			game_state = GAME_LINKING;
 			/*tcp线程启动*/
 			pInsUnicast = new UnicastThread();
 			pInsUnicast->start();
 		}	
-		if(GAME_LINKING == game_state && LINK_SUCCESS == getLinkState())
+		if(GAME_LINK == game_state && LINK_SUCCESS == getLinkState())
 		{
 			game_state = GAME_READY;
 			/*发送线程启动*/
@@ -79,7 +72,7 @@ void MonitorThread::run()
 		{
 			game_state = GAME_FIGHT;
 		}
-#if 0		
+		
 		if(GAME_FIGHT == game_state && true == advance_state)
 		{
 			game_state = GAME_OVER;
@@ -98,11 +91,11 @@ void MonitorThread::run()
 			game_state = GAME_EXIT;
 			advance_state = false;
 		}
-#endif
+
 		msleep(50);
 		mvprintw(0, (COLS-strlen("game state is 12"))/2, "game state is %2d", game_state);
+#endif
 	}
-	
 	if(NULL != pInsSend)
 		delete pInsSend;
 	if(NULL != pInsRecv)

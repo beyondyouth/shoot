@@ -51,8 +51,7 @@ int main()
 	u8 buf[256] = {"hello"};
 	UdpClient* pInsUdp = NULL;
 	pInsUdp = new UdpClient();
-	pInsUdp->init("192.168.99.128", 8817);
-	pInsUdp->conn(8817);
+	pInsUdp->init(8818);
 	
 	for(int i = 0; i < 20; i++)
 	{

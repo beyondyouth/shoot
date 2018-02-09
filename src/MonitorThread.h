@@ -15,4 +15,4 @@ private:
 	
 };
 
-#endif
+#endif /*MONITOR_THREAD_H__*/

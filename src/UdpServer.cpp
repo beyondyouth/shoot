@@ -8,6 +8,11 @@ UdpServer::~UdpServer()
 {
 }
 
+bool UdpServer::init(const char* localIp, u16 localPort)
+{
+	return false;
+}
+
 bool UdpServer::init(u16 localPort)
 {
 	_localPort = localPort;
@@ -15,7 +20,7 @@ bool UdpServer::init(u16 localPort)
 	_sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	if(-1 == _sockfd)
 	{
-		printf("error:%s %d",__FILE__, __LINE__);
+		printf("error:%s %d\n",__FILE__, __LINE__);
 		return -1;
 	}
 
@@ -30,16 +35,16 @@ bool UdpServer::init(u16 localPort)
 	bzero(&(_clientAddr.sin_zero), 8);
 	
 	const int opt = 1;
-	if(-1 == setsockopt(_sockfd, SOL_SOCKET, SO_BROADCAST, (char *)&opt, sizeof(opt)))
-    {  
+	if(-1 == setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)))
+    {
         close(_sockfd);
-		printf("error:%s %d",__FILE__, __LINE__);
+		printf("error:%s %d\n",__FILE__, __LINE__);
 		return false; 
     }
 	if(-1 == bind(_sockfd,(struct sockaddr *)&_serverAddr,sizeof(_serverAddr)))
 	{
 		close(_sockfd);
-		printf("error:%s %d",__FILE__, __LINE__);
+		printf("error:%s %d\n",__FILE__, __LINE__);
 		return false;
 	}
 	return true;
@@ -65,7 +70,7 @@ bool UdpServer::readData(u8 *buf,u32 len)
 	int nlen = sizeof(sockaddr_in);
 	if(-1 == recvfrom(_sockfd, buf, len, 0, (sockaddr*)&_clientAddr, (socklen_t*)&nlen))
 	{
-		printf("error:%s %d",__FILE__, __LINE__);
+		printf("error:%s %d\n",__FILE__, __LINE__);
 		return false;
 	}
 	return true;
@@ -77,7 +82,7 @@ bool UdpServer::writeData(const u8 *buf,u32 len)
 		len = MAXDATASIZE;
 	if(-1 == sendto(_sockfd, buf, len, 0, (sockaddr*)&_clientAddr, sizeof(sockaddr_in)))
 	{
-		printf("error:%s %d",__FILE__, __LINE__);
+		printf("error:%s %d\n", __FILE__, __LINE__);
 		return false;
 	}
 	return true;
@@ -89,4 +94,9 @@ bool UdpServer::closeConn()
 	close(_sockfd);
 	_sockfd = -1;
 	return true;
+}
+
+sockaddr_in UdpServer::getClientAddr()
+{
+	return _clientAddr;
 }

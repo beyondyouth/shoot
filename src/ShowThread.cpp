@@ -4,7 +4,8 @@
 #include "KeyThread.h"
 #include "RecvThread.h"
 
-extern int getMenuOrder();
+extern Node* head;
+extern Node* getKeyNode();
 
 int iX_remote = COLS/2, iY_remote = LINES/2;
 char sX_remote[4] = {0};
@@ -13,21 +14,6 @@ char sY_remote[4] = {0};
 int iX_local = COLS/2, iY_local = COLS/2;
 char sX_local[4] = {0};
 char sY_local[4] = {0};
-
-
-static char* item[] = 
-{
-	(char*)"create room",
-	(char*)"join room",
-	(char*)"exit"
-};
-
-static int sum_item = sizeof(item)/sizeof(item[0]);
-
-u8 getItemLen()
-{
-	return sum_item;
-}
 
 bool ShowThread::init()
 {
@@ -57,10 +43,18 @@ void ShowThread::destroy_win(WINDOW* local_win)
 
 void ShowThread::home()
 {
-	for(int i = 0; i < sum_item; i++)
+	int i = 0;
+	if(NULL == head)
 	{
-		mvprintw((LINES - sum_item)/2 + i, (COLS-strlen(item[i]))/2, "%s", item[i]);/*显示主菜单*/
+		return;
 	}
+	Node* p = head;
+	for(; p->next != NULL; p = p->next)
+	{
+		mvprintw((LINES - getlen())/2 + i, (COLS-strlen(p->data))/2, "%s", p->data);/*显示ip列表*/
+		i++;
+	}
+	mvprintw((LINES - getlen())/2 + i, (COLS-strlen(p->data))/2, "%s", p->data);
 }
 
 
@@ -91,23 +85,31 @@ void ShowThread::run()
 //	static int iX_remote_org = COLS/2, iY_remote_org = LINES/2;
 //	static int iX_local_org = COLS/2, iY_local_org = LINES/2;
 	init();
+	home();
 	while(GAME_EXIT != getGameState())
 	{
 		switch(getGameState())
 		{
-			case GAME_MAINMENU:
+			case GAME_SELECT:
 			{
-				home();
-				for(int j = 0; j < sum_item; j++)
+				int i = 0;
+				if(NULL == head)
 				{
-					if(j == getMenuOrder())
-					{
+					break;
+				}
+				Node* p = head;
+				for(; p->next != NULL; p = p->next)
+				{
+					if(p == getKeyNode())
 						attron(A_BOLD);
-					}
-					mvprintw((LINES - sum_item)/2 + j, (COLS-strlen(item[j]))/2, "%s", item[j]);
+					mvprintw((LINES - getlen())/2 + i, (COLS-strlen(p->data))/2, "%s", p->data);/*显示ip列表*/
+					i++;
 					attroff(A_BOLD);
 				}
-				
+				if(p == getKeyNode())
+					attron(A_BOLD);
+				mvprintw((LINES - getlen())/2 + i, (COLS-strlen(p->data))/2, "%s", p->data);
+				attroff(A_BOLD);
 				break;
 			}
 			case GAME_FIGHT:
