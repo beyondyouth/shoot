@@ -26,7 +26,7 @@ bool TcpServer::init(const char* localIp, u16 localPort)
 	_serverAddr.sin_addr.s_addr = INADDR_ANY;
 	bzero(&(_serverAddr.sin_zero), 8);
 	
-	if(-1 == bind(_sockfd,(struct sockaddr *)&_serverAddr,sizeof(_serverAddr)))
+	if(-1 == bind(_sockfd, (struct sockaddr *)&_serverAddr, sizeof(_serverAddr)))
 	{
 		close(_sockfd);
 		printf("error:%s %d",__FILE__, __LINE__);
@@ -60,8 +60,8 @@ bool TcpServer::setSocketNonblock()
 bool TcpServer::acceptConn()
 {
 	u32 addrLen = sizeof(_clientAddr);
-	bzero(&_clientAddr,addrLen);
-	_client_sockfd = accept(_sockfd,(struct sockaddr *)&_clientAddr,(socklen_t*)&addrLen);
+	bzero(&_clientAddr, addrLen);
+	_client_sockfd = accept(_sockfd, (struct sockaddr *)&_clientAddr, (socklen_t*)&addrLen);
 	if(0 == _client_sockfd)
 	{
 		printf("error:%s %d",__FILE__, __LINE__);
