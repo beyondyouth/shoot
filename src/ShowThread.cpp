@@ -97,16 +97,19 @@ void ShowThread::run()
 				{
 					break;
 				}
+				/*sp:选中的节点*/
+				Node* sp = getKeyNode();
 				Node* p = head;
 				for(; p->next != NULL; p = p->next)
 				{
-					if(p == getKeyNode())
+					if(p == sp)
 						attron(A_BOLD);
 					mvprintw((LINES - getlen())/2 + i, (COLS-strlen(p->data))/2, "%s", p->data);/*显示ip列表*/
 					i++;
 					attroff(A_BOLD);
 				}
-				if(p == getKeyNode())
+				i++;
+				if(p == sp)
 					attron(A_BOLD);
 				mvprintw((LINES - getlen())/2 + i, (COLS-strlen(p->data))/2, "%s", p->data);
 				attroff(A_BOLD);

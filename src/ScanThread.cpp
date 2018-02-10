@@ -20,45 +20,57 @@ void push(Node* n)
 		head = n;
 		head->next = NULL;
 		head->prev = NULL;
+//		printf("push ip%d:%s head_addr:%d\r\n", i, head->data, head);
 		return;
 	}
 	/*在最后添加新的ip节点*/
 	Node* p = head;
-	for(; p->next != NULL; p = p->next);
+	for(; p->next != NULL; p = p->next)
+		i++;
+	i++;
 	p->next = n;
 	n->prev = p;
 	n->next = NULL;
+//	printf("push ip%d:%s addr:%d\r\n", i, p->data, p);
 }
 
 void erase(Node* n)
 {
-	if(NULL == head)
-	{
+	if(NULL == n)
 		return;
-	}
+	if(NULL == head)
+		return;
 	if(n == head)
 	{
+		head = n->next;
 		delete n;
+		return;
 	}
 	/*删除n指向的Node节点*/
-	for(Node* p = head; p->next != NULL; p = p->next)
+	Node* p = head;
+	while(p->next != NULL)
 	{
 		if(p->next == n)
 		{
 			p->next = n->next;
-			(n->next)->prev = p;
+			if(NULL != n->next)
+				(n->next)->prev = p;
 			if(NULL != n)
 				delete n;
 		}
+		if(NULL != p->next)
+			p = p->next;
+		else
+			break;
 	}
 }
 
 Node* find(char* d)
 {
-	if(NULL == head)
-	{
+	if(NULL == d)
 		return NULL;
-	}
+	if(NULL == head)
+		return NULL;
 	/*寻找数据匹配的节点地址*/
 	Node* p = head;
 	for(; p->next != NULL; p = p->next)
@@ -85,10 +97,10 @@ void output()
 	Node* p = head;
 	for(; p->next != NULL; p = p->next)
 	{
-		printf("ip%d:%s addr:%d\r\n", i, p->data, p);
+		printf("ip%d:%s\r\n", i, p->data);
 		i++;
 	}
-	printf("ip%d:%s addr:%d\r\n", i, p->data, p);
+	printf("ip%d:%s\r\n", i, p->data);
 }
 
 int getlen()
@@ -139,7 +151,7 @@ void ScanThread::run()
 				if(NULL != n)
 					delete n;
 			}
-			//output();
+			output();
 		}
 		if(!strcmp(recv, "sign up "))
 		{
@@ -158,7 +170,7 @@ void ScanThread::run()
 				if(NULL != n)
 					delete n;
 			}
-			//output();
+			output();
 		}
 		if(!strcmp(recv, "sign out"))
 		{
@@ -174,7 +186,7 @@ void ScanThread::run()
 			{
 				erase(n);
 			}
-			//output();
+			output();
 		}
 		/*清空接收缓存*/
 		bzero(recv, 256);	

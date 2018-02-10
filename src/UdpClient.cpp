@@ -23,14 +23,14 @@ bool UdpClient::init(u16 servPort)
 	_sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	if (-1 == _sockfd)
 	{
-		printf("error:%s %d",__FILE__, __LINE__);
+		printf("error:%s %d\n",__FILE__, __LINE__);
 		return false;
 	}
 	
 	const int opt = 1;
 	if(-1 == setsockopt(_sockfd, SOL_SOCKET, SO_BROADCAST, (char *)&opt, sizeof(opt)))
 	{
-		printf("error:%s %d",__FILE__, __LINE__);
+		printf("error:%s %d\n",__FILE__, __LINE__);
 		return false;
 	}
 
@@ -74,7 +74,7 @@ bool UdpClient::readData(u8 *buf,u32 len)
 	int nlen = sizeof(_serverAddr);
 	if(-1 == recvfrom(_sockfd, buf, len, 0, (sockaddr*)&_serverAddr, (socklen_t*)&nlen))
 	{
-		printf("error:%s %d",__FILE__, __LINE__);
+		printf("error:%s %d\n",__FILE__, __LINE__);
 		return false;
 	}
 	return true;
@@ -87,7 +87,7 @@ bool UdpClient::writeData(const u8 *buf, u32 len)
 	int nlen = sizeof(_serverAddr);
 	if(-1 == sendto(_sockfd, buf, len, 0, (sockaddr*)&_serverAddr, nlen))
 	{
-		printf("error:%s %d",__FILE__, __LINE__);
+		printf("error:%s %d\n",__FILE__, __LINE__);
 		return false;
 	}
 	return true;
@@ -99,14 +99,14 @@ bool UdpClient::sendto2(const char* serverIp, u16 serverPort, const u8* buf, u32
 	int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	if (-1 == sockfd)
 	{
-		printf("error:%s %d",__FILE__, __LINE__);
+		printf("error:%s %d\n",__FILE__, __LINE__);
 		return false;
 	}
 	
 	const int opt = 1;
 	if(-1 == setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, (char *)&opt, sizeof(opt)))
 	{
-		printf("error:%s %d",__FILE__, __LINE__);
+		printf("error:%s %d\n",__FILE__, __LINE__);
 		//return false;
 	}
 
@@ -118,7 +118,7 @@ bool UdpClient::sendto2(const char* serverIp, u16 serverPort, const u8* buf, u32
 	int nlen = sizeof(serverAddr);
 	if(-1 == sendto(sockfd, buf, len, 0, (sockaddr*)&serverAddr, nlen))
 	{
-		printf("error:%s %d",__FILE__, __LINE__);
+		printf("error:%s %d\n",__FILE__, __LINE__);
 		//return false;
 	}
 	shutdown(sockfd, SHUT_RDWR);
